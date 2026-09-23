@@ -37,11 +37,11 @@ def deactivate_meal(*, meal: Meal) -> Meal:
 
 def _schedule_queryset():
     return MealSchedule.objects.select_related("meal").annotate(
-        reserved_count=Count(
+        _reserved_count=Count(
             "reservations",
             filter=Q(reservations__status=ReservationStatus.RESERVED),
         ),
-        remaining_capacity=Coalesce(F("capacity"), Value(0), output_field=IntegerField())
+        _remaining_capacity=Coalesce(F("capacity"), Value(0), output_field=IntegerField())
         - Count(
             "reservations",
             filter=Q(reservations__status=ReservationStatus.RESERVED),

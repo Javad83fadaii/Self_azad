@@ -26,8 +26,8 @@ class MealScheduleSerializer(serializers.ModelSerializer):
         queryset=Meal.objects.all(),
         write_only=True,
     )
-    reserved_count = serializers.IntegerField(read_only=True)
-    remaining_capacity = serializers.IntegerField(read_only=True)
+    reserved_count = serializers.IntegerField(read_only=True, source="_reserved_count")
+    remaining_capacity = serializers.IntegerField(read_only=True, source="_remaining_capacity")
 
     class Meta:
         model = MealSchedule
