@@ -10,9 +10,11 @@ __pycache__/
 build/
 dist/
 *.spec
+!ufrs_student_desktop.spec
 *.egg-info/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 backend/staticfiles/
 backend/media/
+installer/Output/

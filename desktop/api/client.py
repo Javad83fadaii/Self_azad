@@ -3,16 +3,14 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin
 from urllib.request import Request, urlopen
 
-from dotenv import load_dotenv
+from desktop.runtime import load_runtime_environment
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-load_dotenv(PROJECT_ROOT / ".env")
+load_runtime_environment()
 
 
 @dataclass(slots=True)
@@ -29,8 +27,10 @@ class ApiClient:
     """Minimal synchronous REST client used by the desktop UI."""
 
     def __init__(self, base_url: str | None = None, timeout: float = 10.0) -> None:
-        self.base_url = (base_url or os.getenv("API_BASE_URL") or "http://127.0.0.1:8000").rstrip("/") + "/"
-        self.timeout = timeout
+        configured_base_url = base_url or os.getenv("API_BASE_URL") or "http://127.0.0.1:8000"
+        configured_timeout = os.getenv("API_TIMEOUT_SECONDS")
+        self.base_url = configured_base_url.rstrip("/") + "/"
+        self.timeout = float(configured_timeout or timeout)
         self.token: str | None = None
 
     def set_token(self, token: str | None) -> None:

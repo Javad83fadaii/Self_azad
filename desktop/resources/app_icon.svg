@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="UFRS">
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="plate" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#dbeafe"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="224" height="224" rx="52" fill="url(#bg)"/>
+  <circle cx="128" cy="132" r="64" fill="url(#plate)"/>
+  <circle cx="128" cy="132" r="41" fill="#93c5fd"/>
+  <path d="M84 74c18-18 42-28 67-28 8 0 17 1 25 3-12 4-23 10-32 19-18 18-28 42-28 67 0 8 1 17 3 25-22-6-42-18-57-35-14-15-22-33-24-51 13 1 31 1 46 0z" fill="#bfdbfe" opacity=".75"/>
+  <path d="M170 67c8 0 14 6 14 14v92c0 8-6 14-14 14s-14-6-14-14V81c0-8 6-14 14-14zm-85 0c8 0 14 6 14 14v39c0 8-6 14-14 14s-14-6-14-14V81c0-8 6-14 14-14zm42 0c8 0 14 6 14 14v92c0 8-6 14-14 14s-14-6-14-14V81c0-8 6-14 14-14z" fill="#1e3a8a"/>
+</svg>

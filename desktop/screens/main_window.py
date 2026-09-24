@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QFormLayout,
@@ -28,6 +28,7 @@ from PySide6.QtWidgets import (
 
 from desktop.api.client import ApiClient, ApiError
 from desktop.auth.session import AuthSession
+from desktop.runtime import icon_path
 from desktop.services.student_service import StudentApiService
 from desktop.utils.errors import translate_error
 from desktop.utils.formatters import (
@@ -543,6 +544,9 @@ class MainWindow(QMainWindow):
     def _setup_ui(self) -> None:
         self.setWindowTitle("سامانه رزرو غذای سلف دانشگاه - نسخه دانشجو")
         self.setMinimumSize(1200, 760)
+        app_icon = icon_path()
+        if app_icon.is_file():
+            self.setWindowIcon(QIcon(str(app_icon)))
         self.setStatusBar(QStatusBar(self))
 
         root = QWidget(self)

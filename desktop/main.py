@@ -9,16 +9,22 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from PySide6.QtCore import QTimer, Qt
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
+from desktop.runtime import APP_NAME, icon_path, load_runtime_environment
 from desktop.screens.main_window import MainWindow
 
 
 def main() -> int:
     """Run the desktop application."""
+    load_runtime_environment()
     app = QApplication(sys.argv)
-    app.setApplicationName("UFRS Student Desktop")
+    app.setApplicationName(APP_NAME)
     app.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+    app_icon = icon_path()
+    if app_icon.is_file():
+        app.setWindowIcon(QIcon(str(app_icon)))
     window = MainWindow()
     window.show()
 

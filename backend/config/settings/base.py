@@ -37,6 +37,50 @@ def get_int_env(name: str, default: int) -> int:
     return int(value)
 
 
+def build_mysql_database_config(
+    *,
+    require_values: bool = False,
+    defaults: dict[str, str] | None = None,
+) -> dict[str, object]:
+    """Build the MySQL database configuration from environment variables."""
+    defaults = defaults or {}
+    reader = get_env if require_values else os.getenv
+
+    name = reader("DB_NAME", defaults.get("DB_NAME"))
+    user = reader("DB_USER", defaults.get("DB_USER"))
+    password = reader("DB_PASSWORD", defaults.get("DB_PASSWORD"))
+    host = reader("DB_HOST", defaults.get("DB_HOST"))
+    port = reader("DB_PORT", defaults.get("DB_PORT"))
+
+    if None in {name, user, password, host, port}:
+        missing = [
+            key
+            for key, value in {
+                "DB_NAME": name,
+                "DB_USER": user,
+                "DB_PASSWORD": password,
+                "DB_HOST": host,
+                "DB_PORT": port,
+            }.items()
+            if value is None
+        ]
+        raise RuntimeError(
+            "Missing required database environment variables: " + ", ".join(missing)
+        )
+
+    return {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": name,
+        "USER": user,
+        "PASSWORD": password,
+        "HOST": host,
+        "PORT": port,
+        "OPTIONS": {
+            "charset": "utf8mb4",
+        },
+    }
+
+
 DEBUG = get_bool_env("DEBUG", False)
 SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
@@ -99,19 +143,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": get_env("DB_NAME", "ufrs_db"),
-        "USER": get_env("DB_USER", "root"),
-        "PASSWORD": get_env("DB_PASSWORD", ""),
-        "HOST": get_env("DB_HOST", "127.0.0.1"),
-        "PORT": get_env("DB_PORT", "3306"),
-        "OPTIONS": {
-            "charset": "utf8mb4",
-        },
-    }
-}
+DATABASES = {}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
