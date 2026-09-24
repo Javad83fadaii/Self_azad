@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from rest_framework import permissions, status
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from accounts.serializers import (
@@ -17,6 +18,8 @@ class StudentRegistrationView(APIView):
     """Register a student account and create its linked student profile."""
 
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
 
     def post(self, request, *args, **kwargs):
         serializer = StudentRegistrationSerializer(data=request.data)
@@ -30,6 +33,8 @@ class LoginView(APIView):
     """Authenticate a user and return a DRF token."""
 
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
 
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)

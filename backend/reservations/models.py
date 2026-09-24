@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
 
 from meals.models import MealSchedule
 from students.models import Student
@@ -30,6 +29,11 @@ class Reservation(models.Model):
         related_name="reservations",
     )
     reservation_date = models.DateField(editable=False, db_index=True)
+    active_reservation_date = models.DateField(
+        editable=False,
+        blank=True,
+        null=True,
+    )
     status = models.CharField(
         max_length=16,
         choices=ReservationStatus.choices,
@@ -43,13 +47,14 @@ class Reservation(models.Model):
         ordering = ["-created_at"]
         constraints = [
             models.UniqueConstraint(
-                fields=["student", "reservation_date"],
-                condition=Q(status=ReservationStatus.RESERVED),
-                name="unique_active_student_reservation_per_day",
+                fields=["student", "active_reservation_date"],
+                name="unique_active_student_reservation_date",
             ),
         ]
         indexes = [
             models.Index(fields=["status"], name="reservation_status_idx"),
+            models.Index(fields=["meal_schedule", "status"], name="rsv_sched_status_idx"),
+            models.Index(fields=["student", "reservation_date"], name="reservation_student_date_idx"),
         ]
 
     def clean(self) -> None:
@@ -63,6 +68,9 @@ class Reservation(models.Model):
     def save(self, *args, **kwargs) -> None:
         if self.meal_schedule_id:
             self.reservation_date = self.meal_schedule.date
+        self.active_reservation_date = (
+            self.reservation_date if self.status == ReservationStatus.RESERVED else None
+        )
         self.full_clean()
         super().save(*args, **kwargs)
 

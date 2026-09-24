@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from rest_framework import status
 
@@ -86,6 +87,26 @@ class ReservationApiTests(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"], ReservationStatus.CANCELLED)
+
+    def test_student_can_reserve_again_after_cancellation(self) -> None:
+        first_schedule = create_schedule(meal=self.meal_one, days_offset=2, capacity=2)
+        second_schedule = create_schedule(meal=self.meal_two, days_offset=2, capacity=2)
+
+        create_response = self.student_client.post(
+            "/api/reservations/",
+            {"meal_schedule_id": first_schedule.id},
+            format="json",
+        )
+        cancel_response = self.student_client.delete(f"/api/reservations/{create_response.data['id']}/cancel/")
+        second_response = self.student_client.post(
+            "/api/reservations/",
+            {"meal_schedule_id": second_schedule.id},
+            format="json",
+        )
+
+        self.assertEqual(cancel_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(second_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(second_response.data["schedule_date"], second_schedule.date.isoformat())
 
     def test_student_cannot_cancel_other_students_reservation(self) -> None:
         schedule = create_schedule(meal=self.meal_one, capacity=2)
@@ -208,3 +229,22 @@ class ReservationApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["meal_id"], self.meal_one.id)
+
+    def test_database_constraint_blocks_duplicate_active_reservations_per_day(self) -> None:
+        schedule_one = create_schedule(meal=self.meal_one, days_offset=6, capacity=3)
+        schedule_two = create_schedule(meal=self.meal_two, days_offset=6, capacity=3)
+
+        Reservation.objects.create(
+            reservation_code="RSV-DB-01",
+            student=self.student,
+            meal_schedule=schedule_one,
+            status=ReservationStatus.RESERVED,
+        )
+
+        with self.assertRaises(ValidationError):
+            Reservation.objects.create(
+                reservation_code="RSV-DB-02",
+                student=self.student,
+                meal_schedule=schedule_two,
+                status=ReservationStatus.RESERVED,
+            )

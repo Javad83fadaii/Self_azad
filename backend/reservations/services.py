@@ -85,5 +85,5 @@ def cancel_reservation(*, reservation: Reservation) -> Reservation:
 
     locked_reservation.status = ReservationStatus.CANCELLED
     locked_reservation.cancelled_at = timezone.now()
-    locked_reservation.save(update_fields=["status", "cancelled_at"])
+    locked_reservation.save(update_fields=["status", "cancelled_at", "active_reservation_date"])
     return locked_reservation

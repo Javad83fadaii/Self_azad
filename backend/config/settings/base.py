@@ -29,8 +29,21 @@ def get_bool_env(name: str, default: bool = False) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
-SECRET_KEY = get_env("SECRET_KEY", "change-me-in-env")
-DEBUG = get_bool_env("DEBUG", True)
+def get_int_env(name: str, default: int) -> int:
+    """Parse integer environment variables with a fallback value."""
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return int(value)
+
+
+DEBUG = get_bool_env("DEBUG", False)
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "local-development-secret-key-for-self-food-project-2026-long"
+    else:
+        raise RuntimeError("Missing required environment variable: SECRET_KEY")
 ALLOWED_HOSTS = [
     host.strip()
     for host in get_env("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
@@ -132,10 +145,22 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_RATES": {
+        "auth": "10/min",
+    },
 }
+
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = get_bool_env("SECURE_SSL_REDIRECT", not DEBUG)
+SECURE_HSTS_SECONDS = get_int_env("SECURE_HSTS_SECONDS", 31536000 if not DEBUG else 0)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = get_bool_env("SECURE_HSTS_INCLUDE_SUBDOMAINS", not DEBUG)
+SECURE_HSTS_PRELOAD = get_bool_env("SECURE_HSTS_PRELOAD", not DEBUG)
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+X_FRAME_OPTIONS = "DENY"

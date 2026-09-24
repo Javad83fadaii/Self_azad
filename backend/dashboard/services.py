@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from datetime import timedelta
+from collections import Counter
+from datetime import datetime, time, timedelta
 
 from django.db.models import Count, F, Q
-from django.db.models.functions import TruncDate
 from django.utils import timezone
 
 from meals.models import MealSchedule
@@ -26,6 +26,9 @@ def resolve_dashboard_range(*, start_date=None, end_date=None):
 
 def get_dashboard_data(*, start_date=None, end_date=None) -> dict:
     start_date, end_date = resolve_dashboard_range(start_date=start_date, end_date=end_date)
+    current_tz = timezone.get_current_timezone()
+    start_dt = timezone.make_aware(datetime.combine(start_date, time.min), current_tz)
+    end_dt = timezone.make_aware(datetime.combine(end_date + timedelta(days=1), time.min), current_tz)
 
     reservations_by_day = list(
         MealSchedule.objects.filter(date__range=(start_date, end_date))
@@ -78,22 +81,30 @@ def get_dashboard_data(*, start_date=None, end_date=None) -> dict:
             }
         )
 
-    daily_reservations = list(
-        Reservation.objects.annotate(date=TruncDate("created_at"))
-        .filter(date__range=(start_date, end_date))
-        .values("date")
-        .annotate(reservation_count=Count("id"))
-        .order_by("date")
+    daily_reservations_counts = Counter(
+        timezone.localtime(created_at, current_tz).date()
+        for created_at in Reservation.objects.filter(
+            created_at__gte=start_dt,
+            created_at__lt=end_dt,
+        ).values_list("created_at", flat=True)
     )
+    daily_reservations = [
+        {"date": date, "reservation_count": daily_reservations_counts[date]}
+        for date in sorted(daily_reservations_counts)
+    ]
 
-    cancelled_reservations = list(
-        Reservation.objects.filter(cancelled_at__isnull=False)
-        .annotate(date=TruncDate("cancelled_at"))
-        .filter(date__range=(start_date, end_date))
-        .values("date")
-        .annotate(cancelled_count=Count("id"))
-        .order_by("date")
+    cancelled_reservations_counts = Counter(
+        timezone.localtime(cancelled_at, current_tz).date()
+        for cancelled_at in Reservation.objects.filter(
+            cancelled_at__isnull=False,
+            cancelled_at__gte=start_dt,
+            cancelled_at__lt=end_dt,
+        ).values_list("cancelled_at", flat=True)
     )
+    cancelled_reservations = [
+        {"date": date, "cancelled_count": cancelled_reservations_counts[date]}
+        for date in sorted(cancelled_reservations_counts)
+    ]
 
     return {
         "start_date": start_date,
