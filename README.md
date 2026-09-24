@@ -1,6 +1,6 @@
 # University Food Reservation System (UFRS)
 
-UFRS یک سیستم رزرو غذای سلف دانشگاه با معماری `Backend-First` است. در فاز ۳، بخش Backend و REST API پروژه پیاده‌سازی شده و شامل احراز هویت، Roleها، APIهای دانشجو و مدیر، قوانین رزرو و تست‌های API است.
+UFRS یک سیستم رزرو غذای سلف دانشگاه با معماری `Backend-First` است. در فاز ۶، علاوه بر Backend و REST API فازهای قبلی، داشبورد مدیریتی، گزارش‌های مدیریتی و خروجی‌های CSV/Excel/PDF نیز پیاده‌سازی شده‌اند.
 
 ## معماری
 
@@ -75,7 +75,7 @@ Authorization: Token <token>
 
 ## مستندات API
 
-Schema استاندارد OpenAPI از این آدرس در دسترس است و endpointهای فاز ۳ را پوشش می‌دهد:
+Schema استاندارد OpenAPI از این آدرس در دسترس است و endpointهای فاز ۶ را پوشش می‌دهد:
 
 ```text
 /api/schema/
@@ -134,6 +134,30 @@ Backend این قوانین را enforce می‌کند:
 - `GET /api/admin/reservations/` `ADMIN`
 - `GET /api/admin/reservations/by-date/?date=YYYY-MM-DD` `ADMIN`
 - `GET /api/admin/reservations/by-meal/?meal_id=<id>` `ADMIN`
+
+### Dashboard API
+
+- `GET /api/admin/dashboard/?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD` `ADMIN`
+
+این endpoint داده نمودارهای زیر را برمی‌گرداند:
+
+- تعداد رزرو به تفکیک روز
+- محبوب‌ترین غذاها
+- Capacity vs Reservations
+- رزروهای روزانه بر اساس `created_at`
+- لغوهای روزانه بر اساس `cancelled_at`
+
+### Reports API
+
+- `GET /api/admin/reports/daily-meals/?date=YYYY-MM-DD` `ADMIN`
+- `GET /api/admin/reports/students/?student_code=&first_name=&last_name=&phone_number=` `ADMIN`
+- `GET /api/admin/reports/meals/` `ADMIN`
+
+هر سه endpoint از export پشتیبانی می‌کنند:
+
+- `?export=csv`
+- `?export=xlsx`
+- `?export=pdf`
 
 ## نمونه Request/Response
 
@@ -312,24 +336,113 @@ Authorization: Token <admin-token>
 }
 ```
 
-## اجرای تست‌ها
+### 10. نمونه Dashboard
 
-برای اجرای تست‌های فاز ۳:
-
-```powershell
-python backend\manage.py test accounts students meals reservations --settings=config.settings.test
+```http
+GET /api/admin/dashboard/?start_date=2026-09-20&end_date=2026-09-30
+Authorization: Token <admin-token>
 ```
 
-## وضعیت فاز ۳
+```json
+{
+  "start_date": "2026-09-20",
+  "end_date": "2026-09-30",
+  "charts": {
+    "reservations_by_day": [
+      {
+        "date": "2026-09-30",
+        "reservation_count": 28
+      }
+    ],
+    "popular_meals": [
+      {
+        "meal_id": 4,
+        "meal_name": "Ghormeh Sabzi",
+        "total_reservations": 18
+      }
+    ],
+    "capacity_vs_reservations": [
+      {
+        "schedule_id": 12,
+        "date": "2026-09-30",
+        "meal_id": 4,
+        "meal_name": "Ghormeh Sabzi",
+        "capacity": 100,
+        "reservation_count": 28,
+        "remaining_capacity": 72
+      }
+    ],
+    "daily_reservations": [
+      {
+        "date": "2026-09-23",
+        "reservation_count": 11
+      }
+    ],
+    "cancelled_reservations": [
+      {
+        "date": "2026-09-24",
+        "cancelled_count": 3
+      }
+    ]
+  }
+}
+```
+
+### 11. نمونه Daily Meal Report
+
+```http
+GET /api/admin/reports/daily-meals/?date=2026-09-30
+Authorization: Token <admin-token>
+```
+
+```json
+{
+  "date": "2026-09-30",
+  "results": [
+    {
+      "schedule_id": 12,
+      "meal_id": 4,
+      "meal_name": "Ghormeh Sabzi",
+      "reservation_count": 28,
+      "cancelled_count": 2,
+      "capacity": 100,
+      "remaining_capacity": 72,
+      "utilization_percentage": 28.0
+    }
+  ]
+}
+```
+
+### 12. نمونه Student Report
+
+```http
+GET /api/admin/reports/students/?first_name=Ali&phone_number=0912
+Authorization: Token <admin-token>
+```
+
+### 13. نمونه Meal Report
+
+```http
+GET /api/admin/reports/meals/
+Authorization: Token <admin-token>
+```
+
+## اجرای تست‌ها
+
+برای اجرای تست‌های فاز ۶:
+
+```powershell
+python backend\manage.py test accounts students meals reservations dashboard reports --settings=config.settings.test
+```
+
+## وضعیت فاز ۶
 
 در این فاز این موارد انجام شده‌اند:
 
-- پیاده‌سازی Custom User و Roleهای `ADMIN` و `STUDENT`
-- پیاده‌سازی Token Authentication برای API
-- پیاده‌سازی Permissionهای جداگانه برای Student و Admin
-- پیاده‌سازی APIهای دانشجو، غذا، برنامه غذایی و رزرو
-- پیاده‌سازی Service Layer برای منطق رزرو
-- اعمال Business Ruleها در Backend
-- مستندسازی API در README و `/api/schema/`
-- نوشتن و اجرای تست‌های API
-- تکمیل تست‌های permission، scope داده‌های دانشجو و فیلترهای مدیریتی رزرو
+- پیاده‌سازی Dashboard مدیریتی با dataset نمودارها
+- پیاده‌سازی Daily Meal Report با انتخاب تاریخ
+- پیاده‌سازی Student Report با جستجو بر اساس کد دانشجویی، نام، نام خانوادگی و تلفن
+- پیاده‌سازی Meal Report تجمیعی برای هر غذا
+- پیاده‌سازی export در قالب‌های `CSV`، `Excel` و `PDF`
+- مستندسازی endpointهای فاز ۶ در README و `/api/schema/`
+- نوشتن و اجرای تست‌های dashboard و reports
