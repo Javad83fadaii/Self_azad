@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from desktop.runtime import app_data_dir, icon_path, load_runtime_environment
+from desktop.runtime import app_data_dir, icon_path, iter_env_candidates, load_runtime_environment
 
 
 class DesktopRuntimeTests(unittest.TestCase):
@@ -28,7 +28,14 @@ class DesktopRuntimeTests(unittest.TestCase):
             self.assertEqual(app_data_dir(), Path(r"C:\Temp\AppData") / "ufrs_student_desktop")
 
     def test_icon_path_points_to_packaged_resource(self) -> None:
-        self.assertEqual(icon_path().name, "app_icon.svg")
+        self.assertEqual(icon_path().name, "app_icon.ico")
+
+    def test_runtime_checks_desktop_env_next_to_executable(self) -> None:
+        executable_root = Path(r"C:\Apps\UFRS")
+        with patch("desktop.runtime.executable_dir", return_value=executable_root):
+            candidates = iter_env_candidates()
+        self.assertIn(executable_root / "desktop.env", candidates)
+        self.assertIn(executable_root / "config" / "desktop.env", candidates)
 
 
 if __name__ == "__main__":

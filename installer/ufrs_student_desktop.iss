@@ -1,8 +1,18 @@
-#define MyAppName "UFRS Student Desktop"
-#define MyAppVersion "1.0.0"
-#define MyAppPublisher "Self Food Project"
-#define MyAppExeName "UFRSStudentDesktop.exe"
-#define MyAppSourceDir "..\dist\UFRSStudentDesktop"
+#ifndef MyAppName
+  #define MyAppName "UFRS Student Desktop"
+#endif
+#ifndef MyAppVersion
+  #define MyAppVersion "1.0.0"
+#endif
+#ifndef MyAppPublisher
+  #define MyAppPublisher "Self Food Project"
+#endif
+#ifndef MyAppExeName
+  #define MyAppExeName "UFRSStudentDesktop.exe"
+#endif
+#ifndef MyAppSourceDir
+  #define MyAppSourceDir "..\dist\UFRSStudentDesktop"
+#endif
 
 [Setup]
 AppId={{7E266E6A-A1FE-49C4-B2B8-7D0A978D9E0B}
@@ -29,6 +39,8 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription:
 
 [Files]
 Source: "{#MyAppSourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MyAppSourceDir}\config\desktop.env.example"; DestDir: "{userappdata}\ufrs_student_desktop"; DestName: "desktop.env.example"; Flags: onlyifdoesntexist skipifsourcedoesntexist
+Source: "{#MyAppSourceDir}\README.md"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 
 [Dirs]
 Name: "{userappdata}\ufrs_student_desktop"

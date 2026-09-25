@@ -6,13 +6,23 @@ from pathlib import Path
 
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 
-PROJECT_ROOT = Path.cwd()
+PROJECT_ROOT = Path(SPECPATH).resolve()
 APP_NAME = "UFRSStudentDesktop"
 ICON_PATH = PROJECT_ROOT / "desktop" / "resources" / "app_icon.ico"
+RESOURCE_DIR = PROJECT_ROOT / "desktop" / "resources"
 
 datas = collect_data_files("desktop", includes=["resources/*"])
 datas += [
-    (str(PROJECT_ROOT / ".env.example"), "."),
+    (
+        str(resource_file),
+        str(resource_file.parent.relative_to(PROJECT_ROOT)),
+    )
+    for resource_file in RESOURCE_DIR.rglob("*")
+    if resource_file.is_file() and "__pycache__" not in resource_file.parts
+]
+datas += [
+    (str(PROJECT_ROOT / "desktop.env.example"), "config"),
+    (str(PROJECT_ROOT / ".env.production.example"), "config"),
     (str(PROJECT_ROOT / "README.md"), "."),
 ]
 hiddenimports = collect_submodules("desktop") + ["dotenv"]

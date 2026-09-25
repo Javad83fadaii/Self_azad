@@ -17,7 +17,10 @@ def is_frozen() -> bool:
 
 def bundle_root() -> Path:
     if is_frozen():
-        return Path(getattr(sys, "_MEIPASS"))
+        meipass = getattr(sys, "_MEIPASS", None)
+        if meipass:
+            return Path(meipass)
+        return executable_dir()
     return PROJECT_ROOT
 
 
@@ -33,11 +36,25 @@ def app_data_dir() -> Path:
 
 
 def resource_path(*parts: str) -> Path:
-    return bundle_root().joinpath(*parts)
+    relative_path = Path(*parts)
+    candidates = [
+        bundle_root() / relative_path,
+        executable_dir() / relative_path,
+        PROJECT_ROOT / relative_path,
+    ]
+
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    return candidates[0]
 
 
 def icon_path() -> Path:
-    return resource_path("desktop", "resources", "app_icon.svg")
+    for icon_name in ("app_icon.ico", "app_icon.svg"):
+        candidate = resource_path("desktop", "resources", icon_name)
+        if candidate.is_file():
+            return candidate
+    return resource_path("desktop", "resources", "app_icon.ico")
 
 
 def iter_env_candidates() -> list[Path]:
@@ -50,12 +67,20 @@ def iter_env_candidates() -> list[Path]:
     candidates.extend(
         [
             executable_dir() / ".env",
+            executable_dir() / "desktop.env",
             executable_dir() / "config" / "desktop.env",
             app_data_dir() / "desktop.env",
             PROJECT_ROOT / ".env",
         ]
     )
-    return candidates
+
+    unique_candidates: list[Path] = []
+    seen: set[Path] = set()
+    for candidate in candidates:
+        if candidate not in seen:
+            unique_candidates.append(candidate)
+            seen.add(candidate)
+    return unique_candidates
 
 
 def load_runtime_environment() -> Path | None:

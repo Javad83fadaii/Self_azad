@@ -10,7 +10,44 @@ from dotenv import load_dotenv
 BACKEND_DIR = Path(__file__).resolve().parents[2]
 ROOT_DIR = BACKEND_DIR.parent
 
-load_dotenv(ROOT_DIR / ".env")
+
+def iter_backend_env_candidates() -> list[Path]:
+    """Return backend environment files in load priority order."""
+    explicit_env = os.getenv("BACKEND_ENV_FILE")
+    candidates: list[Path] = []
+
+    if explicit_env:
+        candidates.append(Path(explicit_env).expanduser())
+
+    candidates.extend(
+        [
+            ROOT_DIR / ".env",
+            ROOT_DIR / ".env.local",
+            ROOT_DIR / ".env.production",
+            BACKEND_DIR / ".env",
+        ]
+    )
+
+    # Preserve order while removing duplicates.
+    unique_candidates: list[Path] = []
+    seen: set[Path] = set()
+    for candidate in candidates:
+        if candidate not in seen:
+            unique_candidates.append(candidate)
+            seen.add(candidate)
+    return unique_candidates
+
+
+def load_backend_environment() -> Path | None:
+    """Load the first available backend environment file."""
+    for env_file in iter_backend_env_candidates():
+        if env_file.is_file():
+            load_dotenv(env_file, override=False)
+            return env_file
+    return None
+
+
+BACKEND_ENV_FILE = load_backend_environment()
 
 
 def get_env(name: str, default: str | None = None) -> str:
@@ -78,6 +115,15 @@ def build_mysql_database_config(
         "OPTIONS": {
             "charset": "utf8mb4",
         },
+    }
+
+
+def build_sqlite_database_config(name: str | Path | None = None) -> dict[str, object]:
+    """Build a SQLite configuration for local development and validation."""
+    database_name = Path(name) if name is not None else ROOT_DIR / "dev_db.sqlite3"
+    return {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": database_name,
     }
 
 
