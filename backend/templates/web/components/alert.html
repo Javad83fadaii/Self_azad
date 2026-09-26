@@ -1,0 +1,9 @@
+<div class="alert alert-{{ level|default:'info' }}{% if dismissible %} alert-dismissible fade show{% endif %}{% if extra_classes %} {{ extra_classes }}{% endif %}" role="alert">
+    {% if title %}
+        <div class="fw-semibold mb-1">{{ title }}</div>
+    {% endif %}
+    <div>{{ message }}</div>
+    {% if dismissible %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="بستن"></button>
+    {% endif %}
+</div>

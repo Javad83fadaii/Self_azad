@@ -1,0 +1,15 @@
+.admin-table-shell {
+    border: 1px solid rgba(215, 222, 234, 0.85);
+    border-radius: var(--radius-md);
+}
+
+.admin-table-shell table {
+    min-width: 38rem;
+}
+
+.admin-table-shell thead th {
+    background: rgba(31, 75, 153, 0.05);
+    color: var(--color-muted);
+    font-weight: 700;
+    white-space: nowrap;
+}

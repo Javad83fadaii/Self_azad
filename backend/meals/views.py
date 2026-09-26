@@ -12,6 +12,7 @@ from meals.services import (
     deactivate_meal,
     deactivate_schedule,
     list_meals,
+    list_schedules,
     list_upcoming_schedules,
     update_meal,
     update_schedule,
@@ -48,6 +49,16 @@ class ActiveMealListView(APIView):
         return Response(serializer.data)
 
 
+class AdminMealListView(APIView):
+    """List all meals for admin users."""
+
+    permission_classes = [IsAdminRole]
+
+    def get(self, request, *args, **kwargs):
+        serializer = MealSerializer(list_meals(), many=True)
+        return Response(serializer.data)
+
+
 class MealDetailView(APIView):
     """Update or deactivate a meal as admin."""
 
@@ -73,6 +84,16 @@ class UpcomingScheduleListView(APIView):
 
     def get(self, request, *args, **kwargs):
         serializer = MealScheduleSerializer(list_upcoming_schedules(), many=True)
+        return Response(serializer.data)
+
+
+class AdminScheduleListView(APIView):
+    """List meal schedules for admin users."""
+
+    permission_classes = [IsAdminRole]
+
+    def get(self, request, *args, **kwargs):
+        serializer = MealScheduleSerializer(list_schedules(), many=True)
         return Response(serializer.data)
 
 

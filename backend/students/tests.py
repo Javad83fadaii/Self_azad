@@ -1,5 +1,6 @@
 from django.test import TestCase
 from rest_framework import status
+from rest_framework.test import APIClient
 
 from test_helpers import auth_client_for, create_admin_account, create_student_account
 
@@ -22,7 +23,30 @@ class StudentPermissionApiTests(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_student_cannot_access_admin_student_list(self) -> None:
+        response = self.student_client.get("/api/admin/students/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_admin_cannot_access_student_only_profile_endpoint(self) -> None:
         response = self.admin_client.get("/api/students/me/profile/")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_student_can_view_own_profile_with_session_authentication(self) -> None:
+        session_client = APIClient()
+        session_client.force_login(self.student_user)
+
+        response = session_client.get("/api/students/me/profile/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["student_code"], self.student.student_code)
+
+    def test_admin_can_access_student_list_with_session_authentication(self) -> None:
+        session_client = APIClient()
+        session_client.force_login(self.admin_user)
+
+        response = session_client.get("/api/admin/students/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)

@@ -1,0 +1,15 @@
+.student-shell .site-main {
+    padding-top: 1.5rem;
+}
+
+.student-panels {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 991.98px) {
+    .student-panels {
+        grid-template-columns: 1fr;
+    }
+}

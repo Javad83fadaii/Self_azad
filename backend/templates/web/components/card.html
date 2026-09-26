@@ -1,0 +1,18 @@
+<section class="ui-card{% if extra_classes %} {{ extra_classes }}{% endif %}">
+    {% if title or subtitle %}
+        <header class="ui-card__header">
+            {% if title %}
+                <h2 class="ui-card__title">{{ title }}</h2>
+            {% endif %}
+            {% if subtitle %}
+                <p class="ui-card__subtitle">{{ subtitle }}</p>
+            {% endif %}
+        </header>
+    {% endif %}
+
+    {% if content %}
+        <div class="ui-card__body">
+            {{ content }}
+        </div>
+    {% endif %}
+</section>

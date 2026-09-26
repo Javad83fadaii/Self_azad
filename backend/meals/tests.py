@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework import status
 
-from test_helpers import auth_client_for, create_admin_account, create_meal, create_student_account
+from test_helpers import auth_client_for, create_admin_account, create_meal, create_schedule, create_student_account
 
 
 class MealAdminPermissionApiTests(TestCase):
@@ -76,6 +76,18 @@ class MealAdminPermissionApiTests(TestCase):
         self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(update_response.status_code, status.HTTP_200_OK)
         self.assertEqual(update_response.data["name"], "Kotlet Updated")
+
+    def test_admin_can_list_meals_and_schedules_from_admin_namespace(self) -> None:
+        meal = create_meal()
+        create_schedule(meal=meal, capacity=10)
+
+        meals_response = self.admin_client.get("/api/admin/meals/")
+        schedules_response = self.admin_client.get("/api/admin/schedules/")
+
+        self.assertEqual(meals_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(schedules_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(meals_response.data), 1)
+        self.assertEqual(len(schedules_response.data), 1)
 
     def test_admin_can_create_and_deactivate_schedule(self) -> None:
         meal = create_meal()

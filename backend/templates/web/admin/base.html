@@ -1,0 +1,57 @@
+{% extends "web/base/base.html" %}
+{% load static %}
+
+{% block body_class %}admin-shell-body{% endblock %}
+
+{% block body_data_attrs %}data-requires-auth="true" data-required-role="ADMIN"{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'web/css/admin/admin.css' %}">
+    <link rel="stylesheet" href="{% static 'web/css/admin/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'web/css/admin/tables.css' %}">
+    <link rel="stylesheet" href="{% static 'web/css/admin/reports.css' %}">
+{% endblock %}
+
+{% block body %}
+    <div class="admin-shell">
+        <button
+            class="admin-sidebar-toggle btn btn-outline-secondary d-lg-none"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#adminSidebarCanvas"
+            aria-controls="adminSidebarCanvas"
+            aria-label="باز کردن منوی مدیریت"
+        >
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            <span>منو</span>
+        </button>
+
+        <div class="admin-shell__sidebar d-none d-lg-flex">
+            {% include "web/components/admin_sidebar.html" %}
+        </div>
+
+        <div class="offcanvas offcanvas-start admin-sidebar-canvas d-lg-none" tabindex="-1" id="adminSidebarCanvas" aria-labelledby="adminSidebarCanvasLabel">
+            <div class="offcanvas-header">
+                <h2 class="offcanvas-title h6 mb-0" id="adminSidebarCanvasLabel">منوی مدیریت</h2>
+                <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="offcanvas" aria-label="بستن"></button>
+            </div>
+            <div class="offcanvas-body p-0">
+                {% include "web/components/admin_sidebar.html" %}
+            </div>
+        </div>
+
+        <div class="admin-shell__main">
+            {% include "web/components/admin_topbar.html" %}
+            <main class="admin-main">
+                {% block admin_content %}{% endblock %}
+            </main>
+            {% include "web/components/site_footer.html" %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script type="module" src="{% static 'web/js/admin/dashboard.js' %}"></script>
+{% endblock %}

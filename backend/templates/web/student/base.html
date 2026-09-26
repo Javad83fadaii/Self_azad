@@ -1,0 +1,45 @@
+{% extends "web/base/base.html" %}
+{% load static %}
+
+{% block body_class %}student-shell{% endblock %}
+
+{% block body_data_attrs %}data-requires-auth="true" data-required-role="STUDENT"{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'web/css/student/student.css' %}">
+    <link rel="stylesheet" href="{% static 'web/css/student/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'web/css/student/reservation.css' %}">
+{% endblock %}
+
+{% block content %}
+    <section class="student-hero">
+        <div class="student-hero__content">
+            <div>
+                <span class="student-hero__eyebrow">فضای دانشجو</span>
+                <h1 class="student-hero__title">{{ page_heading }}</h1>
+                <p class="student-hero__subtitle">{{ page_subtitle }}</p>
+            </div>
+
+            <div class="student-hero__meta">
+                {% if student_code %}
+                    <div class="student-hero__meta-item">
+                        <span class="student-hero__meta-label">کد دانشجویی</span>
+                        <strong>{{ student_code }}</strong>
+                    </div>
+                {% endif %}
+                <div class="student-hero__meta-item">
+                    <span class="student-hero__meta-label">وضعیت رابط</span>
+                    <strong>Phase 3 UI Shell</strong>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% block student_content %}{% endblock %}
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script type="module" src="{% static 'web/js/student/dashboard.js' %}"></script>
+{% endblock %}

@@ -74,6 +74,12 @@ def get_int_env(name: str, default: int) -> int:
     return int(value)
 
 
+def get_list_env(name: str, default: str = "") -> list[str]:
+    """Parse comma-separated environment variables into a normalized list."""
+    value = os.getenv(name, default)
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
 def build_mysql_database_config(
     *,
     require_values: bool = False,
@@ -134,11 +140,12 @@ if not SECRET_KEY:
         SECRET_KEY = "local-development-secret-key-for-self-food-project-2026-long"
     else:
         raise RuntimeError("Missing required environment variable: SECRET_KEY")
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in get_env("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
-    if host.strip()
-]
+ALLOWED_HOSTS = get_list_env("ALLOWED_HOSTS", "127.0.0.1,localhost")
+WEB_FRONTEND_URL = os.getenv("WEB_FRONTEND_URL", "").strip()
+WEB_ALLOWED_ORIGINS = get_list_env("WEB_ALLOWED_ORIGINS")
+CSRF_TRUSTED_ORIGINS = get_list_env("CSRF_TRUSTED_ORIGINS")
+if WEB_FRONTEND_URL and WEB_FRONTEND_URL not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(WEB_FRONTEND_URL)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -213,6 +220,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BACKEND_DIR / "staticfiles"
+STATICFILES_DIRS = [BACKEND_DIR / "static"]
 MEDIA_URL = "media/"
 MEDIA_ROOT = BACKEND_DIR / "media"
 
@@ -233,8 +241,12 @@ REST_FRAMEWORK = {
     },
 }
 
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = get_bool_env("SESSION_COOKIE_HTTPONLY", True)
+CSRF_COOKIE_HTTPONLY = get_bool_env("CSRF_COOKIE_HTTPONLY", False)
+SESSION_COOKIE_SECURE = get_bool_env("SESSION_COOKIE_SECURE", not DEBUG)
+CSRF_COOKIE_SECURE = get_bool_env("CSRF_COOKIE_SECURE", not DEBUG)
+SESSION_COOKIE_SAMESITE = get_env("SESSION_COOKIE_SAMESITE", "Lax")
+CSRF_COOKIE_SAMESITE = get_env("CSRF_COOKIE_SAMESITE", "Lax")
 SECURE_SSL_REDIRECT = get_bool_env("SECURE_SSL_REDIRECT", not DEBUG)
 SECURE_HSTS_SECONDS = get_int_env("SECURE_HSTS_SECONDS", 31536000 if not DEBUG else 0)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = get_bool_env("SECURE_HSTS_INCLUDE_SUBDOMAINS", not DEBUG)

@@ -1,0 +1,30 @@
+body.web-app {
+    font-family: var(--font-family-base);
+    line-height: 1.7;
+}
+
+.web-app h1,
+.web-app h2,
+.web-app h3,
+.web-app h4,
+.web-app h5,
+.web-app h6 {
+    color: var(--color-text);
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.web-app p,
+.web-app li,
+.web-app label,
+.web-app input,
+.web-app button,
+.web-app th,
+.web-app td {
+    color: var(--color-text);
+}
+
+.web-app .text-muted,
+.web-app .form-text {
+    color: var(--color-muted) !important;
+}

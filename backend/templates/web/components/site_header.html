@@ -1,0 +1,87 @@
+<header class="site-header">
+    <div class="container-fluid site-header__inner">
+        <div class="site-brand">
+            <span class="site-brand__icon" aria-hidden="true">
+                <i class="fa-solid fa-building-columns"></i>
+            </span>
+            <div class="site-brand__text">
+                <a href="{% if current_role == 'ADMIN' %}{% url 'common:web-admin-home' %}{% elif current_role == 'STUDENT' %}{% url 'common:web-student-home' %}{% else %}{% url 'common:web-login' %}{% endif %}" class="site-brand__title">
+                    سامانه رزرو غذای دانشگاه
+                </a>
+                <span class="site-brand__subtitle">سامانه رزرو غذای دانشجویان</span>
+            </div>
+        </div>
+
+        {% if navigation_items %}
+            <nav class="site-nav d-none d-lg-flex" aria-label="ناوبری اصلی">
+                {% for item in navigation_items %}
+                    <a href="{{ item.url }}" class="site-nav__link{% if item.is_active %} is-active{% endif %}">
+                        <i class="{{ item.icon }}" aria-hidden="true"></i>
+                        <span>{{ item.label }}</span>
+                    </a>
+                {% endfor %}
+            </nav>
+        {% else %}
+            <div class="d-none d-lg-flex site-header__spacer" aria-hidden="true"></div>
+        {% endif %}
+
+        <div class="site-header__actions">
+            {% if navigation_items %}
+                <button
+                    class="btn btn-outline-secondary d-lg-none"
+                    type="button"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#mobileNavigation"
+                    aria-controls="mobileNavigation"
+                    aria-label="باز کردن منو"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            {% endif %}
+
+            {% if request.user.is_authenticated %}
+                <span class="status-badge status-badge--soft" data-auth-role-label>{{ current_role_label }}</span>
+                <div class="user-chip" data-auth-user>
+                    <span class="user-chip__avatar" aria-hidden="true">
+                        <i class="fa-solid fa-user"></i>
+                    </span>
+                    <div class="user-chip__content">
+                        <span class="user-chip__label">کاربر واردشده</span>
+                        <strong class="user-chip__name" data-auth-user-name>{{ current_user_name }}</strong>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-sm" data-logout-trigger>
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>خروج</span>
+                </button>
+            {% else %}
+                <a href="{% url 'common:web-login' %}" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>ورود دانشجو</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if navigation_items %}
+        <div class="offcanvas offcanvas-start mobile-nav" tabindex="-1" id="mobileNavigation" aria-labelledby="mobileNavigationLabel">
+            <div class="offcanvas-header">
+                <div>
+                    <h2 class="offcanvas-title h6 mb-1" id="mobileNavigationLabel">منوی سامانه</h2>
+                    <p class="text-muted small mb-0">دسترسی سریع برای نسخه موبایل</p>
+                </div>
+                <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="offcanvas" aria-label="بستن"></button>
+            </div>
+            <div class="offcanvas-body">
+                <nav class="mobile-nav__list" aria-label="ناوبری موبایل">
+                    {% for item in navigation_items %}
+                        <a href="{{ item.url }}" class="mobile-nav__link{% if item.is_active %} is-active{% endif %}">
+                            <i class="{{ item.icon }}" aria-hidden="true"></i>
+                            <span>{{ item.label }}</span>
+                        </a>
+                    {% endfor %}
+                </nav>
+            </div>
+        </div>
+    {% endif %}
+</header>

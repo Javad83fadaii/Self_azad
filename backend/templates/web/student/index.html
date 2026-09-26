@@ -1,0 +1,49 @@
+{% extends "web/student/base.html" %}
+
+{% block title %}فضای دانشجو | سامانه رزرو غذا{% endblock %}
+
+{% block student_content %}
+<div class="content-section">
+    {% include "web/components/alert.html" with level="info" title="اطلاع مهم" message=student_notice extra_classes="mb-4" %}
+
+    <section class="stats-grid" aria-label="کارت‌های وضعیت دانشجو">
+        {% for stat in student_stats %}
+            <article class="stat-card stat-card--{{ stat.tone }}">
+                <div class="stat-card__header">
+                    <span class="stat-card__label">{{ stat.label }}</span>
+                    {% include "web/components/badge.html" with tone=stat.tone label="Placeholder" %}
+                </div>
+                <strong class="stat-card__value">{{ stat.value }}</strong>
+                <p class="stat-card__note">{{ stat.note }}</p>
+            </article>
+        {% endfor %}
+    </section>
+
+    <section class="student-panels">
+        {% for section in student_sections %}
+            <article class="panel-card">
+                <div class="panel-card__icon" aria-hidden="true">
+                    <i class="{{ section.icon }}"></i>
+                </div>
+                <div class="panel-card__body">
+                    <h2 class="panel-card__title">{{ section.title }}</h2>
+                    <p class="panel-card__text">{{ section.description }}</p>
+                    <p class="panel-card__state">{{ section.state }}</p>
+                </div>
+            </article>
+        {% endfor %}
+    </section>
+
+    <section class="reservation-shell">
+        <div class="section-heading">
+            <div>
+                <h2 class="section-heading__title">رزروهای آینده</h2>
+                <p class="section-heading__subtitle">این بخش برای اتصال به API رزرو در فاز بعد آماده شده است.</p>
+            </div>
+            {% include "web/components/button.html" with variant="outline-primary" label="به‌روزرسانی در فاز بعد" icon="fa-solid fa-rotate" extra_classes="section-heading__action" disabled=True %}
+        </div>
+
+        {% include "web/components/empty_state.html" with icon="fa-regular fa-calendar-xmark" title="رزروی برای نمایش وجود ندارد." message="پس از اتصال داشبورد دانشجو به API، رزروهای آینده در این بخش نمایش داده می‌شوند." %}
+    </section>
+</div>
+{% endblock %}

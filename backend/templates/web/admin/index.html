@@ -1,0 +1,72 @@
+{% extends "web/admin/base.html" %}
+
+{% block title %}فضای ادمین | سامانه رزرو غذا{% endblock %}
+
+{% block admin_content %}
+{% include "web/components/alert.html" with level="warning" title="Placeholder Dashboard" message=admin_notice extra_classes="mb-4" %}
+
+<section class="stats-grid admin-stats-grid" aria-label="آمار اولیه مدیریت">
+    {% for stat in admin_stats %}
+        <article class="stat-card stat-card--{{ stat.tone }}">
+            <div class="stat-card__header">
+                <span class="stat-card__label">{{ stat.label }}</span>
+                {% include "web/components/badge.html" with tone=stat.tone label="در انتظار API" %}
+            </div>
+            <strong class="stat-card__value">{{ stat.value }}</strong>
+            <p class="stat-card__note">{{ stat.note }}</p>
+        </article>
+    {% endfor %}
+</section>
+
+<section class="admin-dashboard-grid">
+    <article class="panel-card panel-card--stretch">
+        <div class="section-heading">
+            <div>
+                <h2 class="section-heading__title">رزروهای اخیر</h2>
+                <p class="section-heading__subtitle">جدول نمونه برای تست استایل، RTL و وضعیت‌های صفحه</p>
+            </div>
+            {% include "web/components/button.html" with variant="outline-primary" label="گزارش‌ها در فاز بعد" icon="fa-solid fa-chart-column" disabled=True %}
+        </div>
+
+        <div class="table-responsive admin-table-shell">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col">دانشجو</th>
+                        <th scope="col">وعده</th>
+                        <th scope="col">وضعیت</th>
+                        <th scope="col">تاریخ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in admin_recent_reservations %}
+                        <tr>
+                            <td>{{ item.student }}</td>
+                            <td>{{ item.meal }}</td>
+                            <td>{% include "web/components/badge.html" with tone="warning" label=item.status %}</td>
+                            <td>{{ item.date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include "web/components/pagination.html" with extra_classes="mt-3" %}
+    </article>
+
+    <article class="panel-card">
+        <div class="section-heading">
+            <div>
+                <h2 class="section-heading__title">وضعیت دریافت داده</h2>
+                <p class="section-heading__subtitle">Loading، Empty و Error برای صفحات بعدی از همین الگو استفاده می‌کنند.</p>
+            </div>
+        </div>
+
+        <div class="admin-state-stack">
+            {% include "web/components/loading.html" with message="در حال دریافت اطلاعات..." %}
+            {% include "web/components/empty_state.html" with icon="fa-regular fa-rectangle-list" title="داده‌ای برای گزارش وجود ندارد." message="وقتی ماژول گزارش‌ها پیاده‌سازی شود، داده‌های واقعی در این بخش قرار می‌گیرند." %}
+            {% include "web/components/alert.html" with level="danger" title="نمونه حالت خطا" message="دریافت اطلاعات با مشکل مواجه شد." %}
+        </div>
+    </article>
+</section>
+{% endblock %}

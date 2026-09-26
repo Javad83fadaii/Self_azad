@@ -1,0 +1,24 @@
+:root {
+    --font-family-base: "Vazirmatn", Tahoma, "Segoe UI", sans-serif;
+    --color-primary: #1f4b99;
+    --color-primary-dark: #17386f;
+    --color-secondary: #5f6f85;
+    --color-success: #1f7a52;
+    --color-warning: #b7791f;
+    --color-danger: #b63c3c;
+    --color-info: #276f86;
+    --color-background: #f3f6fb;
+    --color-surface: #ffffff;
+    --color-surface-muted: #f8fafc;
+    --color-text: #1d2736;
+    --color-muted: #667085;
+    --color-border: #d7deea;
+    --color-shadow: rgba(15, 23, 42, 0.08);
+    --header-height: 5rem;
+    --radius-sm: 0.75rem;
+    --radius-md: 1rem;
+    --radius-lg: 1.25rem;
+    --shadow-sm: 0 12px 30px var(--color-shadow);
+    --container-max: 1400px;
+    --transition-base: 0.2s ease;
+}

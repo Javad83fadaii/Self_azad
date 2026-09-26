@@ -1,0 +1,20 @@
+<aside class="admin-sidebar">
+    <div class="admin-sidebar__brand">
+        <span class="admin-sidebar__icon" aria-hidden="true">
+            <i class="fa-solid fa-building-columns"></i>
+        </span>
+        <div>
+            <strong>سامانه رزرو غذا</strong>
+            <p class="mb-0">پنل مدیریت</p>
+        </div>
+    </div>
+
+    <nav class="admin-sidebar__nav" aria-label="منوی مدیریت">
+        {% for item in navigation_items %}
+            <a href="{{ item.url }}" class="admin-sidebar__link{% if item.is_active %} is-active{% endif %}">
+                <i class="{{ item.icon }}" aria-hidden="true"></i>
+                <span>{{ item.label }}</span>
+            </a>
+        {% endfor %}
+    </nav>
+</aside>

@@ -1,0 +1,15 @@
+.surface-muted {
+    background: var(--color-surface-muted);
+}
+
+.text-small {
+    font-size: 0.9rem;
+}
+
+.shadow-soft {
+    box-shadow: var(--shadow-sm);
+}
+
+.border-soft {
+    border: 1px solid rgba(215, 222, 234, 0.85);
+}

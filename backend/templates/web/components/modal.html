@@ -1,0 +1,19 @@
+<div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-labelledby="{{ modal_id }}Label" aria-hidden="true">
+    <div class="modal-dialog{% if modal_size %} modal-{{ modal_size }}{% endif %}">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="{{ modal_id }}Label">{{ title }}</h2>
+                <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="بستن"></button>
+            </div>
+            <div class="modal-body">
+                {{ body }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">بستن</button>
+                {% if confirm_label %}
+                    <button type="button" class="btn btn-primary">{{ confirm_label }}</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

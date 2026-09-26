@@ -58,6 +58,10 @@ def list_upcoming_schedules():
     )
 
 
+def list_schedules():
+    return _schedule_queryset().order_by("date", "meal__name")
+
+
 def create_schedule(**validated_data) -> MealSchedule:
     meal = validated_data["meal"]
     if not meal.is_active:

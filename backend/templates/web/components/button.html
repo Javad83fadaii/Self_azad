@@ -1,0 +1,11 @@
+<button
+    type="{{ button_type|default:'button' }}"
+    class="btn{% if variant %} btn-{{ variant }}{% else %} btn-primary{% endif %}{% if extra_classes %} {{ extra_classes }}{% endif %}"
+    {% if disabled %}disabled{% endif %}
+    {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+>
+    {% if icon %}
+        <i class="{{ icon }}" aria-hidden="true"></i>
+    {% endif %}
+    <span>{{ label }}</span>
+</button>

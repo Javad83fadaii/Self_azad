@@ -1,0 +1,5 @@
+.admin-state-stack .alert,
+.admin-state-stack .loading-state,
+.admin-state-stack .empty-state {
+    width: 100%;
+}

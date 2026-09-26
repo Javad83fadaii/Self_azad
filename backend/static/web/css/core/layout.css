@@ -1,0 +1,225 @@
+.site-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.site-main {
+    flex: 1;
+    padding: 2rem 1rem 2.5rem;
+}
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    backdrop-filter: blur(14px);
+    background: rgba(255, 255, 255, 0.86);
+    border-bottom: 1px solid rgba(215, 222, 234, 0.9);
+}
+
+.site-header__inner {
+    min-height: var(--header-height);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1rem;
+}
+
+.site-brand,
+.site-brand__title,
+.site-header__actions,
+.site-nav,
+.site-footer__inner,
+.student-hero__meta,
+.admin-topbar,
+.admin-topbar__actions {
+    display: flex;
+    align-items: center;
+}
+
+.site-brand {
+    gap: 0.85rem;
+}
+
+.site-brand__icon,
+.panel-card__icon,
+.login-card__badge,
+.empty-state__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.site-brand__icon {
+    width: 3rem;
+    height: 3rem;
+    background: rgba(31, 75, 153, 0.1);
+    color: var(--color-primary);
+    font-size: 1.2rem;
+}
+
+.site-brand__title {
+    font-weight: 800;
+}
+
+.site-brand__subtitle {
+    display: block;
+    color: var(--color-muted);
+    font-size: 0.88rem;
+}
+
+.site-nav {
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.site-nav__link,
+.mobile-nav__link,
+.admin-sidebar__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    border-radius: 999px;
+    transition: all var(--transition-base);
+}
+
+.site-nav__link {
+    padding: 0.7rem 1rem;
+    color: var(--color-muted);
+}
+
+.site-nav__link:hover,
+.site-nav__link.is-active {
+    background: rgba(31, 75, 153, 0.08);
+    color: var(--color-primary);
+}
+
+.site-header__actions {
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.site-footer {
+    margin-top: auto;
+    border-top: 1px solid rgba(215, 222, 234, 0.85);
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.site-footer__inner {
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1rem;
+}
+
+.site-footer__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-muted);
+}
+
+.mobile-nav {
+    width: min(88vw, 320px);
+}
+
+.mobile-nav__list {
+    display: grid;
+    gap: 0.6rem;
+}
+
+.mobile-nav__link {
+    padding: 0.85rem 1rem;
+    color: var(--color-text);
+    background: var(--color-surface-muted);
+}
+
+.mobile-nav__link.is-active {
+    background: rgba(31, 75, 153, 0.1);
+    color: var(--color-primary);
+}
+
+.student-hero {
+    margin-bottom: 1.5rem;
+    padding: 1.6rem;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, rgba(31, 75, 153, 0.08), rgba(255, 255, 255, 0.96));
+    border: 1px solid rgba(31, 75, 153, 0.12);
+}
+
+.student-hero__content,
+.student-hero__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.student-hero__eyebrow,
+.admin-topbar__eyebrow,
+.login-card__eyebrow {
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.student-hero__title {
+    margin: 0.2rem 0 0.5rem;
+    font-size: clamp(1.4rem, 2vw, 2rem);
+}
+
+.student-hero__subtitle {
+    max-width: 48rem;
+    color: var(--color-muted);
+}
+
+.student-hero__meta-item {
+    min-width: 11rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(31, 75, 153, 0.08);
+}
+
+.student-hero__meta-label {
+    display: block;
+    color: var(--color-muted);
+    font-size: 0.85rem;
+    margin-bottom: 0.2rem;
+}
+
+@media (max-width: 1199.98px) {
+    .site-header__inner {
+        grid-template-columns: auto auto;
+    }
+
+    .site-nav {
+        display: none !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .student-hero__content,
+    .student-hero__meta,
+    .site-footer__inner {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .site-main {
+        padding-inline: 0.75rem;
+    }
+
+    .site-header__inner {
+        grid-template-columns: 1fr;
+        justify-items: stretch;
+    }
+
+    .site-header__actions {
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+}

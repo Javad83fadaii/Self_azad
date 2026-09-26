@@ -1,0 +1,74 @@
+{% extends "web/base/base.html" %}
+{% load static %}
+
+{% block title %}ورود دانشجو | سامانه رزرو غذا{% endblock %}
+
+{% block body_class %}login-shell{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'web/css/auth/login.css' %}">
+{% endblock %}
+
+{% block body %}
+<main class="login-page">
+    <div class="container">
+        <div class="row align-items-center justify-content-center g-4">
+            <div class="col-12 col-lg-5">
+                <section class="login-intro">
+                    <span class="login-intro__badge">نسخه وب دانشگاه</span>
+                    <h1 class="login-intro__title">{{ web_app_name }}</h1>
+                    <p class="login-intro__subtitle">{{ login_description }}</p>
+                    <ul class="login-intro__features">
+                        <li><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><span>ورود امن با Session و CSRF</span></li>
+                        <li><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i><span>رابط کاربری واکنش‌گرا برای موبایل و دسکتاپ</span></li>
+                        <li><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>آماده توسعه در فازهای بعدی رزرو و گزارش</span></li>
+                    </ul>
+                </section>
+            </div>
+
+            <div class="col-12 col-md-8 col-lg-5">
+                <section class="login-card shadow-sm">
+                    <div class="login-card__header text-center">
+                        <span class="login-card__badge" aria-hidden="true"><i class="fa-solid fa-building-columns"></i></span>
+                        <p class="login-card__eyebrow">{{ web_brand_subtitle }}</p>
+                        <h2 class="h4 mb-2">{{ login_title }}</h2>
+                        <p class="text-muted mb-0">کد دانشجویی و شماره موبایل ثبت‌شده را وارد کنید.</p>
+                    </div>
+
+                    <div id="login-feedback" class="d-none" aria-live="polite"></div>
+
+                    <form
+                        id="student-login-form"
+                        class="login-form"
+                        novalidate
+                        data-csrf-url="{% url 'accounts:csrf' %}"
+                        data-login-url="{% url 'accounts:student-web-login' %}"
+                        data-success-url="{% url 'common:web-student-home' %}"
+                    >
+                        <div class="mb-3">
+                            <label for="student_code" class="form-label">کد دانشجویی</label>
+                            <input id="student_code" name="student_code" type="text" class="form-control" inputmode="numeric" autocomplete="username" required aria-describedby="student-code-help">
+                            <div id="student-code-help" class="form-text">نمونه: 40110001</div>
+                            <div class="invalid-feedback">کد دانشجویی را وارد کنید.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="phone_number" class="form-label">شماره موبایل</label>
+                            <input id="phone_number" name="phone_number" type="tel" class="form-control" inputmode="tel" autocomplete="tel" placeholder="09121234567" required>
+                            <div class="invalid-feedback">شماره موبایل را وارد کنید.</div>
+                        </div>
+
+                        <button id="login-submit" type="submit" class="btn btn-primary w-100">
+                            <span class="login-submit__label">ورود به سامانه</span>
+                        </button>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+    <script type="module" src="{% static 'web/js/auth/login.js' %}"></script>
+{% endblock %}

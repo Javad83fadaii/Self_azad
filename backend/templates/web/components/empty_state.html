@@ -1,0 +1,7 @@
+<div class="empty-state{% if extra_classes %} {{ extra_classes }}{% endif %}">
+    <div class="empty-state__icon" aria-hidden="true">
+        <i class="{{ icon|default:'fa-regular fa-folder-open' }}"></i>
+    </div>
+    <h3 class="empty-state__title">{{ title|default:'موردی برای نمایش وجود ندارد.' }}</h3>
+    <p class="empty-state__message">{{ message|default:'پس از اتصال این بخش به API، داده‌ها در همین قسمت نمایش داده خواهند شد.' }}</p>
+</div>
