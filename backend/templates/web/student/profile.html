@@ -1,0 +1,30 @@
+{% extends "web/student/base.html" %}
+{% load static %}
+
+{% block title %}پروفایل دانشجو | سامانه رزرو غذا{% endblock %}
+
+{% block student_content %}
+<div class="content-section">
+    <div
+        id="student-profile-page"
+        data-profile-url="{% url 'students:student-profile' %}"
+    >
+        <div id="profile-feedback" class="d-none mb-4" aria-live="polite"></div>
+
+        <section class="reservation-shell">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">اطلاعات پروفایل</h2>
+                    <p class="section-heading__subtitle">این اطلاعات به‌صورت فقط خواندنی از API پروفایل دانشجو دریافت می‌شود.</p>
+                </div>
+            </div>
+            <div id="profile-card" class="dashboard-loading">در حال دریافت اطلاعات پروفایل...</div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script type="module" src="{% static 'web/js/student/profile.js' %}"></script>
+{% endblock %}

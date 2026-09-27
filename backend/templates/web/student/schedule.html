@@ -1,0 +1,70 @@
+{% extends "web/student/base.html" %}
+{% load static %}
+
+{% block title %}برنامه غذایی | سامانه رزرو غذا{% endblock %}
+
+{% block student_content %}
+<div class="content-section">
+    <div
+        id="student-schedule-page"
+        data-schedules-url="{% url 'meals:schedule-upcoming' %}"
+        data-create-reservation-url="{% url 'reservations:reservation-create' %}"
+        data-reservations-url="{% url 'reservations:reservation-my-list' %}"
+        data-csrf-url="{% url 'accounts:csrf' %}"
+        data-reservations-page-url="{% url 'common:web-student-reservations' %}"
+    >
+        <div id="schedule-feedback" class="d-none mb-4" aria-live="polite"></div>
+
+        <section class="reservation-shell">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">برنامه غذایی روزهای آینده</h2>
+                    <p class="section-heading__subtitle">هر روز به‌صورت گروه‌بندی‌شده نمایش داده می‌شود و برای هر غذا ظرفیت و وضعیت رزرو دیده می‌شود.</p>
+                </div>
+                <button type="button" class="btn btn-outline-primary section-heading__action" data-action="refresh-schedules">
+                    <i class="fa-solid fa-rotate"></i>
+                    <span>به‌روزرسانی</span>
+                </button>
+            </div>
+            <div id="schedule-groups" class="dashboard-loading">در حال دریافت برنامه غذایی...</div>
+        </section>
+
+        <div class="modal fade" id="reserveMealModal" tabindex="-1" aria-labelledby="reserveMealModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title fs-5" id="reserveMealModalLabel">تأیید رزرو غذا</h2>
+                        <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="بستن"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-3">آیا از رزرو این غذا مطمئن هستید؟</p>
+                        <dl class="detail-list mb-0">
+                            <div class="detail-list__item">
+                                <dt>غذا</dt>
+                                <dd data-confirm="meal-name">-</dd>
+                            </div>
+                            <div class="detail-list__item">
+                                <dt>تاریخ</dt>
+                                <dd data-confirm="schedule-date">-</dd>
+                            </div>
+                            <div class="detail-list__item">
+                                <dt>کد غذا</dt>
+                                <dd data-confirm="meal-code">-</dd>
+                            </div>
+                        </dl>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">انصراف</button>
+                        <button type="button" class="btn btn-primary" id="confirm-reserve-button">تأیید رزرو</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script type="module" src="{% static 'web/js/student/schedule.js' %}"></script>
+{% endblock %}

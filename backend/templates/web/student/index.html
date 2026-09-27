@@ -1,49 +1,114 @@
 {% extends "web/student/base.html" %}
+{% load static %}
 
 {% block title %}فضای دانشجو | سامانه رزرو غذا{% endblock %}
 
 {% block student_content %}
 <div class="content-section">
-    {% include "web/components/alert.html" with level="info" title="اطلاع مهم" message=student_notice extra_classes="mb-4" %}
+    <div
+        id="student-dashboard-page"
+        data-profile-url="{% url 'students:student-profile' %}"
+        data-reservations-url="{% url 'reservations:reservation-my-list' %}"
+        data-schedules-url="{% url 'meals:schedule-upcoming' %}"
+        data-schedule-page-url="{% url 'common:web-student-schedule' %}"
+        data-reservations-page-url="{% url 'common:web-student-reservations' %}"
+        data-profile-page-url="{% url 'common:web-student-profile' %}"
+        data-csrf-url="{% url 'accounts:csrf' %}"
+    >
+        <div id="dashboard-feedback" class="d-none mb-4" aria-live="polite"></div>
 
-    <section class="stats-grid" aria-label="کارت‌های وضعیت دانشجو">
-        {% for stat in student_stats %}
-            <article class="stat-card stat-card--{{ stat.tone }}">
+        <section class="stats-grid" aria-label="کارت‌های وضعیت دانشجو">
+            <article class="stat-card stat-card--primary">
                 <div class="stat-card__header">
-                    <span class="stat-card__label">{{ stat.label }}</span>
-                    {% include "web/components/badge.html" with tone=stat.tone label="Placeholder" %}
+                    <span class="stat-card__label">رزرو امروز</span>
+                    <span class="status-badge">امروز</span>
                 </div>
-                <strong class="stat-card__value">{{ stat.value }}</strong>
-                <p class="stat-card__note">{{ stat.note }}</p>
+                <strong class="stat-card__value" data-stat="today">در حال بارگذاری...</strong>
+                <p class="stat-card__note">آخرین وضعیت رزرو روز جاری شما در این کارت نمایش داده می‌شود.</p>
             </article>
-        {% endfor %}
-    </section>
-
-    <section class="student-panels">
-        {% for section in student_sections %}
-            <article class="panel-card">
-                <div class="panel-card__icon" aria-hidden="true">
-                    <i class="{{ section.icon }}"></i>
+            <article class="stat-card stat-card--success">
+                <div class="stat-card__header">
+                    <span class="stat-card__label">رزروهای آینده</span>
+                    <span class="status-badge status-badge--soft">پیش‌رو</span>
                 </div>
-                <div class="panel-card__body">
-                    <h2 class="panel-card__title">{{ section.title }}</h2>
-                    <p class="panel-card__text">{{ section.description }}</p>
-                    <p class="panel-card__state">{{ section.state }}</p>
-                </div>
+                <strong class="stat-card__value" data-stat="upcoming">در حال بارگذاری...</strong>
+                <p class="stat-card__note">تعداد رزروهای فعال آینده شما از روی API رزرو محاسبه می‌شود.</p>
             </article>
-        {% endfor %}
-    </section>
+            <article class="stat-card stat-card--info">
+                <div class="stat-card__header">
+                    <span class="stat-card__label">برنامه غذایی</span>
+                    <span class="status-badge status-badge--soft">آینده</span>
+                </div>
+                <strong class="stat-card__value" data-stat="schedule">در حال بارگذاری...</strong>
+                <p class="stat-card__note">تعداد روزهای دارای برنامه غذایی آینده برای رزرو در این بخش نشان داده می‌شود.</p>
+            </article>
+        </section>
 
-    <section class="reservation-shell">
-        <div class="section-heading">
-            <div>
-                <h2 class="section-heading__title">رزروهای آینده</h2>
-                <p class="section-heading__subtitle">این بخش برای اتصال به API رزرو در فاز بعد آماده شده است.</p>
+        <section class="student-grid">
+            <article class="reservation-shell dashboard-panel">
+                <div class="section-heading">
+                    <div>
+                        <h2 class="section-heading__title">رزرو امروز</h2>
+                        <p class="section-heading__subtitle">اگر برای امروز رزرو فعال داشته باشید، جزئیات کامل آن اینجا نمایش داده می‌شود.</p>
+                    </div>
+                    <a href="{% url 'common:web-student-schedule' %}" class="btn btn-outline-primary section-heading__action">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span>مشاهده برنامه غذایی</span>
+                    </a>
+                </div>
+                <div id="today-reservation" class="dashboard-panel__body dashboard-loading">در حال دریافت اطلاعات...</div>
+            </article>
+
+            <article class="reservation-shell dashboard-panel">
+                <div class="section-heading">
+                    <div>
+                        <h2 class="section-heading__title">رزروهای آینده</h2>
+                        <p class="section-heading__subtitle">رزروهای فعال و پیش‌روی شما به‌ترتیب تاریخ در این فهرست دیده می‌شوند.</p>
+                    </div>
+                    <a href="{% url 'common:web-student-reservations' %}" class="btn btn-outline-primary section-heading__action">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>همه رزروها</span>
+                    </a>
+                </div>
+                <div id="upcoming-reservations" class="dashboard-panel__body dashboard-loading">در حال دریافت اطلاعات...</div>
+            </article>
+        </section>
+
+        <section class="reservation-shell">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">دسترسی سریع</h2>
+                    <p class="section-heading__subtitle">برای ثبت رزرو، مشاهده تاریخچه یا بررسی پروفایل از این میانبرها استفاده کنید.</p>
+                </div>
             </div>
-            {% include "web/components/button.html" with variant="outline-primary" label="به‌روزرسانی در فاز بعد" icon="fa-solid fa-rotate" extra_classes="section-heading__action" disabled=True %}
-        </div>
-
-        {% include "web/components/empty_state.html" with icon="fa-regular fa-calendar-xmark" title="رزروی برای نمایش وجود ندارد." message="پس از اتصال داشبورد دانشجو به API، رزروهای آینده در این بخش نمایش داده می‌شوند." %}
-    </section>
+            <div class="quick-actions-grid">
+                <a href="{% url 'common:web-student-schedule' %}" class="quick-action-card">
+                    <span class="quick-action-card__icon"><i class="fa-solid fa-utensils"></i></span>
+                    <strong>رزرو غذا</strong>
+                    <span>برنامه غذایی روزهای آینده و ثبت رزرو</span>
+                </a>
+                <a href="{% url 'common:web-student-schedule' %}" class="quick-action-card">
+                    <span class="quick-action-card__icon"><i class="fa-solid fa-calendar-days"></i></span>
+                    <strong>برنامه غذایی</strong>
+                    <span>بررسی روزهای آینده، ظرفیت باقیمانده و وضعیت رزرو</span>
+                </a>
+                <a href="{% url 'common:web-student-reservations' %}" class="quick-action-card">
+                    <span class="quick-action-card__icon"><i class="fa-solid fa-clipboard-list"></i></span>
+                    <strong>رزروهای من</strong>
+                    <span>مشاهده وضعیت، کد رزرو و لغو رزرو فعال</span>
+                </a>
+                <a href="{% url 'common:web-student-profile' %}" class="quick-action-card">
+                    <span class="quick-action-card__icon"><i class="fa-solid fa-id-card"></i></span>
+                    <strong>پروفایل</strong>
+                    <span>مشاهده اطلاعات دانشجویی و شماره موبایل ثبت‌شده</span>
+                </a>
+            </div>
+        </section>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script type="module" src="{% static 'web/js/student/dashboard.js' %}"></script>
 {% endblock %}

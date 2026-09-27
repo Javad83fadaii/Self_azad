@@ -9,7 +9,15 @@ from .base import *  # noqa: F403,F401
 
 local_database_engine = (os.getenv("LOCAL_DB_ENGINE") or os.getenv("DB_ENGINE") or "sqlite").strip().lower()
 
-if local_database_engine == "mysql" or os.getenv("DB_NAME"):
+if local_database_engine == "mysql":
+    DATABASES = {
+        "default": build_mysql_database_config(require_values=True)  # noqa: F405
+    }
+elif local_database_engine == "sqlite":
+    DATABASES = {
+        "default": build_sqlite_database_config()  # noqa: F405
+    }
+elif os.getenv("DB_NAME"):
     DATABASES = {
         "default": build_mysql_database_config(require_values=True)  # noqa: F405
     }

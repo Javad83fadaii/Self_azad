@@ -1,6 +1,11 @@
 .admin-table-shell {
     border: 1px solid rgba(215, 222, 234, 0.85);
     border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.admin-table-shell .table-responsive {
+    border-radius: var(--radius-md);
 }
 
 .admin-table-shell table {
@@ -12,4 +17,10 @@
     color: var(--color-muted);
     font-weight: 700;
     white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+    .admin-table-shell table {
+        min-width: 28rem;
+    }
 }

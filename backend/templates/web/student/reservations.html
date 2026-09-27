@@ -1,0 +1,68 @@
+{% extends "web/student/base.html" %}
+{% load static %}
+
+{% block title %}رزروهای من | سامانه رزرو غذا{% endblock %}
+
+{% block student_content %}
+<div class="content-section">
+    <div
+        id="student-reservations-page"
+        data-reservations-url="{% url 'reservations:reservation-my-list' %}"
+        data-cancel-url-template="/api/reservations/__id__/cancel/"
+        data-csrf-url="{% url 'accounts:csrf' %}"
+    >
+        <div id="reservations-feedback" class="d-none mb-4" aria-live="polite"></div>
+
+        <section class="reservation-shell">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">فهرست رزروهای من</h2>
+                    <p class="section-heading__subtitle">نام غذا، تاریخ، کد رزرو، وضعیت و زمان ثبت برای همه رزروهای شما در این جدول دیده می‌شود.</p>
+                </div>
+                <button type="button" class="btn btn-outline-primary section-heading__action" data-action="refresh-reservations">
+                    <i class="fa-solid fa-rotate"></i>
+                    <span>به‌روزرسانی</span>
+                </button>
+            </div>
+            <div id="reservations-list" class="dashboard-loading">در حال دریافت رزروها...</div>
+        </section>
+
+        <div class="modal fade" id="cancelReservationModal" tabindex="-1" aria-labelledby="cancelReservationModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title fs-5" id="cancelReservationModalLabel">تأیید لغو رزرو</h2>
+                        <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="بستن"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-3">آیا از لغو این رزرو مطمئن هستید؟</p>
+                        <dl class="detail-list mb-0">
+                            <div class="detail-list__item">
+                                <dt>غذا</dt>
+                                <dd data-confirm="meal-name">-</dd>
+                            </div>
+                            <div class="detail-list__item">
+                                <dt>تاریخ</dt>
+                                <dd data-confirm="schedule-date">-</dd>
+                            </div>
+                            <div class="detail-list__item">
+                                <dt>کد رزرو</dt>
+                                <dd data-confirm="reservation-code">-</dd>
+                            </div>
+                        </dl>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">انصراف</button>
+                        <button type="button" class="btn btn-danger" id="confirm-cancel-button">لغو رزرو</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script type="module" src="{% static 'web/js/student/reservations.js' %}"></script>
+{% endblock %}

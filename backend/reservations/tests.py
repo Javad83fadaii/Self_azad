@@ -137,6 +137,23 @@ class ReservationApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("Past schedules", str(response.data["meal_schedule_id"]))
 
+    def test_inactive_schedule_blocked(self) -> None:
+        schedule = create_schedule(
+            meal=self.meal_one,
+            days_offset=2,
+            capacity=2,
+            is_active=False,
+        )
+
+        response = self.student_client.post(
+            "/api/reservations/",
+            {"meal_schedule_id": schedule.id},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Inactive schedules", str(response.data["meal_schedule_id"]))
+
     def test_reservation_window(self) -> None:
         schedule = create_schedule(
             meal=self.meal_one,

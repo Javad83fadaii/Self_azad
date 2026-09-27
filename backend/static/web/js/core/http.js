@@ -32,6 +32,28 @@ function createApiError(response, data) {
     return error;
 }
 
+function persistLoginMessage(message) {
+    try {
+        window.sessionStorage.setItem("web-login-message", message);
+    } catch (error) {
+        return;
+    }
+}
+
+function handleUnauthorizedResponse(response) {
+    if (response.status !== 401) {
+        return;
+    }
+
+    const loginUrl = document.body?.dataset?.loginUrl;
+    if (!loginUrl) {
+        return;
+    }
+
+    persistLoginMessage("جلسه ورود شما منقضی شده است. دوباره وارد سامانه شوید.");
+    window.location.assign(loginUrl);
+}
+
 function normalizeErrorDetail(data) {
     if (!data || typeof data !== "object") {
         return "";
@@ -111,6 +133,7 @@ export async function request(url, options = {}) {
     const responseData = await parseResponseBody(response);
 
     if (!response.ok) {
+        handleUnauthorizedResponse(response);
         throw createApiError(response, responseData);
     }
 
@@ -192,4 +215,16 @@ export function extractErrorMessage(error) {
     }
 
     return "ارتباط با سرور برقرار نشد.";
+}
+
+export function consumeLoginMessage() {
+    try {
+        const message = window.sessionStorage.getItem("web-login-message") || "";
+        if (message) {
+            window.sessionStorage.removeItem("web-login-message");
+        }
+        return message;
+    } catch (error) {
+        return "";
+    }
 }

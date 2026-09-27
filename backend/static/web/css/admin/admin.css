@@ -103,6 +103,13 @@
     bottom: 1rem;
     z-index: 1035;
     box-shadow: var(--shadow-sm);
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .admin-sidebar-toggle {
+        display: inline-flex;
+    }
 }
 
 .admin-sidebar-canvas {
@@ -129,5 +136,23 @@
     .admin-topbar__actions {
         width: 100%;
         justify-content: space-between;
+    }
+
+    .user-chip {
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .user-chip__content {
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .user-chip__name {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 12rem;
     }
 }

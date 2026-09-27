@@ -90,8 +90,27 @@
     }
 }
 
+@media (max-width: 767.98px) {
+    .login-intro {
+        text-align: center;
+    }
+
+    .login-intro__features {
+        text-align: right;
+    }
+
+    .login-intro__badge {
+        margin: 0 auto;
+    }
+}
+
 @media (max-width: 575.98px) {
     .login-card {
         padding: 1.4rem;
+    }
+
+    .login-intro__features li {
+        padding: 0.7rem 0.85rem;
+        font-size: 0.92rem;
     }
 }

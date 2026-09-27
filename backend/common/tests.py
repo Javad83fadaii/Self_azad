@@ -59,6 +59,24 @@ class WebUiShellTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/login/?next=/admin/")
 
+    def test_student_schedule_redirects_to_login_when_unauthenticated(self) -> None:
+        response = self.client.get("/student/schedule/")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/login/?next=/student/schedule/")
+
+    def test_student_reservations_redirects_to_login_when_unauthenticated(self) -> None:
+        response = self.client.get("/student/reservations/")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/login/?next=/student/reservations/")
+
+    def test_student_profile_redirects_to_login_when_unauthenticated(self) -> None:
+        response = self.client.get("/student/profile/")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/login/?next=/student/profile/")
+
     def test_student_can_login_and_open_student_dashboard(self) -> None:
         create_student_account(first_name="علی", last_name="احمدی")
         browser_client = self._create_browser_client()
@@ -115,3 +133,19 @@ class WebUiShellTests(TestCase):
         self.assertEqual(logout_response.status_code, 200)
         self.assertEqual(dashboard_response.status_code, 302)
         self.assertEqual(dashboard_response.url, "/login/?next=/student/")
+
+    def test_student_can_open_schedule_reservations_and_profile_pages(self) -> None:
+        student_user, student = create_student_account(first_name="زهرا", last_name="محمدی")
+        self.client.force_login(student_user)
+
+        schedule_response = self.client.get("/student/schedule/")
+        reservations_response = self.client.get("/student/reservations/")
+        profile_response = self.client.get("/student/profile/")
+
+        self.assertEqual(schedule_response.status_code, 200)
+        self.assertContains(schedule_response, "برنامه غذایی")
+        self.assertEqual(reservations_response.status_code, 200)
+        self.assertContains(reservations_response, "رزروهای من")
+        self.assertEqual(profile_response.status_code, 200)
+        self.assertContains(profile_response, student.student_code)
+        self.assertContains(profile_response, "پروفایل دانشجو")

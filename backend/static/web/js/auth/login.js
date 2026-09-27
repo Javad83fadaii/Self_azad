@@ -1,4 +1,4 @@
-import { ensureCsrfToken, extractErrorMessage, post } from "../core/http.js";
+import { consumeLoginMessage, ensureCsrfToken, extractErrorMessage, post } from "../core/http.js";
 
 const form = document.querySelector("#student-login-form");
 const feedback = document.querySelector("#login-feedback");
@@ -28,6 +28,11 @@ function validateForm() {
 }
 
 if (form && feedback && submitButton) {
+    const loginMessage = consumeLoginMessage();
+    if (loginMessage) {
+        showFeedback(loginMessage, "warning");
+    }
+
     [form.student_code, form.phone_number].forEach((field) => {
         field.addEventListener("input", () => {
             validateField(field);

@@ -70,6 +70,7 @@ a:hover {
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: 1.25rem;
+    flex-wrap: wrap;
 }
 
 .section-heading__title {

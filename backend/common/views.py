@@ -15,19 +15,19 @@ STUDENT_NAV_ITEMS = [
     {"label": "خانه", "url_name": "common:web-student-home", "icon": "fa-solid fa-house", "key": "student-home"},
     {
         "label": "برنامه غذایی",
-        "url_name": "common:web-student-home",
+        "url_name": "common:web-student-schedule",
         "icon": "fa-solid fa-utensils",
         "key": "student-schedule",
     },
     {
         "label": "رزروهای من",
-        "url_name": "common:web-student-home",
+        "url_name": "common:web-student-reservations",
         "icon": "fa-solid fa-receipt",
         "key": "student-reservations",
     },
     {
         "label": "پروفایل",
-        "url_name": "common:web-student-home",
+        "url_name": "common:web-student-profile",
         "icon": "fa-solid fa-user",
         "key": "student-profile",
     },
@@ -85,6 +85,17 @@ def build_placeholder_stat(*, label: str, value: str, tone: str, note: str) -> d
         "value": value,
         "tone": tone,
         "note": note,
+    }
+
+
+def build_student_page_context(*, user, heading: str, subtitle: str) -> dict[str, object]:
+    student = getattr(user, "student_profile", None)
+    student_name = student.full_name if student is not None else build_user_display_name(user)
+    return {
+        "student_name": student_name,
+        "student_code": student.student_code if student is not None else None,
+        "page_heading": heading,
+        "page_subtitle": subtitle,
     }
 
 
@@ -166,7 +177,7 @@ class RoleProtectedTemplateView(LoginRequiredMixin, TemplateView):
 
 
 class StudentHomePlaceholderView(RoleProtectedTemplateView):
-    """Render the student placeholder page until the dashboard is built."""
+    """Render the authenticated student dashboard shell."""
 
     expected_role = UserRole.STUDENT
     active_section = "student-home"
@@ -177,53 +188,68 @@ class StudentHomePlaceholderView(RoleProtectedTemplateView):
         student = getattr(self.request.user, "student_profile", None)
         student_name = student.full_name if student is not None else build_user_display_name(self.request.user)
         context.update(
-            {
-                "student_name": student_name,
-                "student_code": student.student_code if student is not None else None,
-                "page_heading": f"سلام، {student_name}",
-                "page_subtitle": "این داشبورد در فاز ۳ به عنوان پوسته اصلی وب و محل تست layout آماده شده است.",
-                "student_sections": [
-                    {
-                        "title": "رزرو امروز",
-                        "description": "جایگاه این بخش برای نمایش اطلاعات رزرو روز جاری آماده شده است.",
-                        "state": "اطلاعات در فاز بعد از API دریافت خواهد شد.",
-                        "icon": "fa-solid fa-sun",
-                    },
-                    {
-                        "title": "رزروهای آینده",
-                        "description": "لیست رزروهای آینده در این ناحیه قرار می‌گیرد.",
-                        "state": "فعلاً فقط ساختار ظاهری و حالت empty برای این بخش آماده شده است.",
-                        "icon": "fa-solid fa-calendar-check",
-                    },
-                    {
-                        "title": "وضعیت رزرو",
-                        "description": "وضعیت نهایی رزرو، استفاده‌شده یا لغوشده در این کارت نمایش داده می‌شود.",
-                        "state": "به‌صورت آگاهانه از نمایش داده جعلی جلوگیری شده است.",
-                        "icon": "fa-solid fa-circle-info",
-                    },
-                ],
-                "student_notice": "این صفحه فقط پوسته اصلی رابط دانشجو را نشان می‌دهد و هنوز به داده‌های واقعی رزرو متصل نشده است.",
-                "student_stats": [
-                    build_placeholder_stat(
-                        label="رزرو امروز",
-                        value="در انتظار اتصال",
-                        tone="info",
-                        note="اطلاعات این بخش در فاز بعد از API دریافت خواهد شد.",
-                    ),
-                    build_placeholder_stat(
-                        label="رزروهای آینده",
-                        value="Placeholder",
-                        tone="warning",
-                        note="UI این کارت آماده است و داده واقعی بعداً متصل می‌شود.",
-                    ),
-                    build_placeholder_stat(
-                        label="وضعیت رزرو",
-                        value="بدون داده",
-                        tone="secondary",
-                        note="برای جلوگیری از نمایش اطلاعات جعلی، این بخش فعلاً فقط حالت نمایشی دارد.",
-                    ),
-                ],
-            }
+            build_student_page_context(
+                user=self.request.user,
+                heading=f"سلام، {student_name}",
+                subtitle="نمای کلی رزرو امروز، رزروهای آینده و دسترسی سریع به برنامه غذایی و پروفایل.",
+            )
+        )
+        return context
+
+
+class StudentScheduleView(RoleProtectedTemplateView):
+    """Render the student schedule page shell."""
+
+    expected_role = UserRole.STUDENT
+    active_section = "student-schedule"
+    template_name = "web/student/schedule.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            build_student_page_context(
+                user=self.request.user,
+                heading="برنامه غذایی",
+                subtitle="لیست روزهای آینده، ظرفیت باقیمانده و امکان ثبت رزرو از روی برنامه غذایی.",
+            )
+        )
+        return context
+
+
+class StudentReservationListView(RoleProtectedTemplateView):
+    """Render the authenticated student's reservation list page shell."""
+
+    expected_role = UserRole.STUDENT
+    active_section = "student-reservations"
+    template_name = "web/student/reservations.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            build_student_page_context(
+                user=self.request.user,
+                heading="رزروهای من",
+                subtitle="مشاهده رزروهای ثبت‌شده، وضعیت هر رزرو و امکان لغو رزرو فعال.",
+            )
+        )
+        return context
+
+
+class StudentProfilePageView(RoleProtectedTemplateView):
+    """Render the authenticated student's profile page shell."""
+
+    expected_role = UserRole.STUDENT
+    active_section = "student-profile"
+    template_name = "web/student/profile.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            build_student_page_context(
+                user=self.request.user,
+                heading="پروفایل دانشجو",
+                subtitle="اطلاعات هویتی و دانشگاهی ثبت‌شده برای حساب کاربری شما.",
+            )
         )
         return context
 

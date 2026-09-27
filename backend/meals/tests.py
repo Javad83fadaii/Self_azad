@@ -109,3 +109,27 @@ class MealAdminPermissionApiTests(TestCase):
 
         self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class StudentUpcomingScheduleApiTests(TestCase):
+    def setUp(self) -> None:
+        self.student_user, _ = create_student_account()
+        self.student_client = auth_client_for(self.student_user)
+        self.meal = create_meal(name="Adas Polo", code="ADAS")
+
+    def test_student_can_view_upcoming_schedules(self) -> None:
+        schedule = create_schedule(meal=self.meal, capacity=25)
+
+        response = self.student_client.get("/api/schedules/upcoming/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["id"], schedule.id)
+        self.assertEqual(response.data[0]["capacity"], 25)
+        self.assertEqual(response.data[0]["reservation_state"], "AVAILABLE")
+        self.assertTrue(response.data[0]["is_reservable"])
+
+    def test_upcoming_schedule_requires_authentication(self) -> None:
+        response = self.client.get("/api/schedules/upcoming/")
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
