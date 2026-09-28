@@ -3,7 +3,7 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.admin-dashboard-grid {
+.admin-dashboard-layout {
     display: grid;
     gap: 1.5rem;
     grid-template-columns: minmax(0, 1.7fr) minmax(18rem, 1fr);
@@ -21,7 +21,7 @@
 }
 
 @media (max-width: 991.98px) {
-    .admin-dashboard-grid,
+    .admin-dashboard-layout,
     .admin-stats-grid {
         grid-template-columns: 1fr;
     }

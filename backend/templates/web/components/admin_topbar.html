@@ -2,6 +2,9 @@
     <div>
         <p class="admin-topbar__eyebrow mb-1">محیط مدیریت</p>
         <h1 class="admin-topbar__title mb-0">{{ page_heading }}</h1>
+        {% if page_subtitle %}
+            <p class="admin-topbar__subtitle mb-0 mt-2">{{ page_subtitle }}</p>
+        {% endif %}
     </div>
 
     <div class="admin-topbar__actions">

@@ -3,7 +3,7 @@
 
 {% block body_class %}admin-shell-body{% endblock %}
 
-{% block body_data_attrs %}data-requires-auth="true" data-required-role="ADMIN"{% endblock %}
+{% block body_data_attrs %}data-requires-auth="true" data-required-role="ADMIN" data-admin-page="{{ admin_page|default:'' }}"{% endblock %}
 
 {% block extra_css %}
     {{ block.super }}
@@ -53,5 +53,6 @@
 
 {% block extra_js %}
     {{ block.super }}
-    <script type="module" src="{% static 'web/js/admin/dashboard.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script type="module" src="{% static 'web/js/admin/app.js' %}"></script>
 {% endblock %}

@@ -11,15 +11,16 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from accounts.serializers import (
+    AdminWebLoginSerializer,
     CurrentUserSerializer,
     LoginResponseSerializer,
     LoginSerializer,
-    StudentWebLoginResponseSerializer,
     StudentWebLoginSerializer,
     StudentRegistrationResponseSerializer,
     StudentRegistrationSerializer,
+    WebLoginResponseSerializer,
 )
-from accounts.services import build_current_user_payload, login_student_for_web, login_user, register_student
+from accounts.services import build_current_user_payload, login_admin_for_web, login_student_for_web, login_user, register_student
 
 
 class StudentRegistrationView(APIView):
@@ -90,10 +91,32 @@ class StudentWebLoginView(APIView):
         serializer.is_valid(raise_exception=True)
         student = login_student_for_web(**serializer.validated_data)
         django_login(request, student.user, backend="django.contrib.auth.backends.ModelBackend")
-        response_serializer = StudentWebLoginResponseSerializer(
+        response_serializer = WebLoginResponseSerializer(
             {
                 "success": True,
                 "user": build_current_user_payload(user=student.user),
+            }
+        )
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
+
+
+@method_decorator(csrf_protect, name="dispatch")
+class AdminWebLoginView(APIView):
+    """Authenticate an admin for browser usage via Django sessions."""
+
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
+
+    def post(self, request, *args, **kwargs):
+        serializer = AdminWebLoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = login_admin_for_web(**serializer.validated_data)
+        django_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+        response_serializer = WebLoginResponseSerializer(
+            {
+                "success": True,
+                "user": build_current_user_payload(user=user),
             }
         )
         return Response(response_serializer.data, status=status.HTTP_200_OK)

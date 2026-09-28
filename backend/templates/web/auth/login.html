@@ -1,7 +1,7 @@
 {% extends "web/base/base.html" %}
 {% load static %}
 
-{% block title %}ورود دانشجو | سامانه رزرو غذا{% endblock %}
+{% block title %}ورود به سامانه | سامانه رزرو غذا{% endblock %}
 
 {% block body_class %}login-shell{% endblock %}
 
@@ -21,7 +21,7 @@
                     <ul class="login-intro__features">
                         <li><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><span>ورود امن با Session و CSRF</span></li>
                         <li><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i><span>رابط کاربری واکنش‌گرا برای موبایل و دسکتاپ</span></li>
-                        <li><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>آماده توسعه در فازهای بعدی رزرو و گزارش</span></li>
+                        <li><i class="fa-solid fa-user-shield" aria-hidden="true"></i><span>ورود مستقل برای دانشجو و مدیر سامانه</span></li>
                     </ul>
                 </section>
             </div>
@@ -31,37 +31,83 @@
                     <div class="login-card__header text-center">
                         <span class="login-card__badge" aria-hidden="true"><i class="fa-solid fa-building-columns"></i></span>
                         <p class="login-card__eyebrow">{{ web_brand_subtitle }}</p>
-                        <h2 class="h4 mb-2">{{ login_title }}</h2>
-                        <p class="text-muted mb-0">کد دانشجویی و شماره موبایل ثبت‌شده را وارد کنید.</p>
+                        <h2 class="h4 mb-2">ورود به سامانه</h2>
+                        <p class="text-muted mb-0">بر اساس نوع حساب، فرم مناسب را تکمیل کنید.</p>
                     </div>
 
-                    <div id="login-feedback" class="d-none" aria-live="polite"></div>
+                    <ul class="nav nav-pills login-tabs mb-4" id="login-tablist" role="tablist">
+                        <li class="nav-item flex-fill" role="presentation">
+                            <button class="nav-link active w-100" id="student-login-tab" data-bs-toggle="pill" data-bs-target="#student-login-pane" type="button" role="tab" aria-controls="student-login-pane" aria-selected="true">
+                                ورود دانشجو
+                            </button>
+                        </li>
+                        <li class="nav-item flex-fill" role="presentation">
+                            <button class="nav-link w-100" id="admin-login-tab" data-bs-toggle="pill" data-bs-target="#admin-login-pane" type="button" role="tab" aria-controls="admin-login-pane" aria-selected="false">
+                                ورود مدیر
+                            </button>
+                        </li>
+                    </ul>
 
-                    <form
-                        id="student-login-form"
-                        class="login-form"
-                        novalidate
-                        data-csrf-url="{% url 'accounts:csrf' %}"
-                        data-login-url="{% url 'accounts:student-web-login' %}"
-                        data-success-url="{% url 'common:web-student-home' %}"
-                    >
-                        <div class="mb-3">
-                            <label for="student_code" class="form-label">کد دانشجویی</label>
-                            <input id="student_code" name="student_code" type="text" class="form-control" inputmode="numeric" autocomplete="username" required aria-describedby="student-code-help">
-                            <div id="student-code-help" class="form-text">نمونه: 40110001</div>
-                            <div class="invalid-feedback">کد دانشجویی را وارد کنید.</div>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="student-login-pane" role="tabpanel" aria-labelledby="student-login-tab" tabindex="0">
+                            <div class="alert d-none" data-login-feedback aria-live="polite"></div>
+                            <form
+                                id="student-login-form"
+                                class="login-form"
+                                novalidate
+                                data-web-login-form="student"
+                                data-csrf-url="{% url 'accounts:csrf' %}"
+                                data-login-url="{% url 'accounts:student-web-login' %}"
+                                data-success-url="{% url 'common:web-student-home' %}"
+                            >
+                                <div class="mb-3">
+                                    <label for="student_code" class="form-label">کد دانشجویی</label>
+                                    <input id="student_code" name="student_code" type="text" class="form-control" inputmode="numeric" autocomplete="username" required aria-describedby="student-code-help">
+                                    <div id="student-code-help" class="form-text">نمونه: 40110001</div>
+                                    <div class="invalid-feedback">کد دانشجویی را وارد کنید.</div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="phone_number" class="form-label">شماره موبایل</label>
+                                    <input id="phone_number" name="phone_number" type="tel" class="form-control" inputmode="tel" autocomplete="tel" placeholder="09121234567" required>
+                                    <div class="invalid-feedback">شماره موبایل را وارد کنید.</div>
+                                </div>
+
+                                <button id="student-login-submit" type="submit" class="btn btn-primary w-100">
+                                    <span class="login-submit__label">ورود دانشجو</span>
+                                </button>
+                            </form>
                         </div>
 
-                        <div class="mb-4">
-                            <label for="phone_number" class="form-label">شماره موبایل</label>
-                            <input id="phone_number" name="phone_number" type="tel" class="form-control" inputmode="tel" autocomplete="tel" placeholder="09121234567" required>
-                            <div class="invalid-feedback">شماره موبایل را وارد کنید.</div>
-                        </div>
+                        <div class="tab-pane fade" id="admin-login-pane" role="tabpanel" aria-labelledby="admin-login-tab" tabindex="0">
+                            <div class="alert d-none" data-login-feedback aria-live="polite"></div>
+                            <form
+                                id="admin-login-form"
+                                class="login-form"
+                                novalidate
+                                data-web-login-form="admin"
+                                data-csrf-url="{% url 'accounts:csrf' %}"
+                                data-login-url="{% url 'accounts:admin-web-login' %}"
+                                data-success-url="{% url 'common:web-admin-home' %}"
+                            >
+                                <div class="mb-3">
+                                    <label for="admin_username" class="form-label">نام کاربری</label>
+                                    <input id="admin_username" name="username" type="text" class="form-control" autocomplete="username" required>
+                                    <div class="invalid-feedback">نام کاربری مدیر را وارد کنید.</div>
+                                </div>
 
-                        <button id="login-submit" type="submit" class="btn btn-primary w-100">
-                            <span class="login-submit__label">ورود به سامانه</span>
-                        </button>
-                    </form>
+                                <div class="mb-4">
+                                    <label for="admin_password" class="form-label">رمز عبور</label>
+                                    <input id="admin_password" name="password" type="password" class="form-control" autocomplete="current-password" required>
+                                    <div class="invalid-feedback">رمز عبور را وارد کنید.</div>
+                                </div>
+
+                                <button id="admin-login-submit" type="submit" class="btn btn-outline-primary w-100">
+                                    <span class="login-submit__label">ورود مدیر</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </section>
             </div>
         </div>

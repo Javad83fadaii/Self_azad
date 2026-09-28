@@ -35,6 +35,24 @@ class AuthenticationApiTests(TestCase):
             HTTP_X_CSRFTOKEN=csrf_token,
         )
 
+    def _login_admin_for_web(
+        self,
+        client: APIClient,
+        *,
+        username: str = "admin",
+        password: str = "AdminPass123",
+    ):
+        csrf_token = self._issue_csrf_token(client)
+        return client.post(
+            "/api/auth/admin/login/",
+            {
+                "username": username,
+                "password": password,
+            },
+            format="json",
+            HTTP_X_CSRFTOKEN=csrf_token,
+        )
+
     def test_student_registration_creates_student_role_account(self) -> None:
         response = self.client.post(
             "/api/auth/student/register/",
@@ -116,6 +134,40 @@ class AuthenticationApiTests(TestCase):
         browser_client = self._create_browser_client()
 
         response = self._login_student_for_web(browser_client)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["detail"], "اطلاعات ورود صحیح نیست.")
+
+    def test_admin_web_login_creates_session(self) -> None:
+        create_admin_account()
+        browser_client = self._create_browser_client()
+
+        response = self._login_admin_for_web(browser_client)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["success"])
+        self.assertEqual(response.data["user"]["role"], "ADMIN")
+        self.assertEqual(response.data["user"]["username"], "admin")
+        self.assertEqual(browser_client.session.get("_auth_user_id"), str(response.data["user"]["id"]))
+
+    def test_admin_web_login_rejects_invalid_credentials_with_generic_message(self) -> None:
+        create_admin_account()
+        browser_client = self._create_browser_client()
+
+        response = self._login_admin_for_web(browser_client, password="WrongPass123")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["detail"], "اطلاعات ورود صحیح نیست.")
+
+    def test_admin_web_login_rejects_student_role_account(self) -> None:
+        create_student_account()
+        browser_client = self._create_browser_client()
+
+        response = self._login_admin_for_web(
+            browser_client,
+            username="40110001",
+            password="StrongPass123",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["detail"], "اطلاعات ورود صحیح نیست.")

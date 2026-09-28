@@ -1,0 +1,91 @@
+{% extends "web/admin/base.html" %}
+
+{% block title %}مدیریت رزروها | سامانه رزرو غذا{% endblock %}
+
+{% block admin_content %}
+<div
+    id="admin-reservations-page"
+    data-list-url="{% url 'reservations:reservation-admin-list' %}"
+    data-by-date-url="{% url 'reservations:reservation-by-date' %}"
+    data-by-meal-url="{% url 'reservations:reservation-by-meal' %}"
+    data-meals-url="{% url 'meals:admin-meal-list' %}"
+>
+    <div id="admin-reservations-feedback" class="d-none mb-4" aria-live="polite"></div>
+
+    <section class="admin-toolbar-card mb-4">
+        <div class="admin-filter-grid admin-filter-grid--wide">
+            <div class="admin-filter-field">
+                <label for="reservation-date-filter" class="form-label">تاریخ</label>
+                <input id="reservation-date-filter" type="date" class="form-control">
+            </div>
+            <div class="admin-filter-field">
+                <label for="reservation-meal-filter" class="form-label">غذا</label>
+                <select id="reservation-meal-filter" class="form-select">
+                    <option value="ALL">همه غذاها</option>
+                </select>
+            </div>
+            <div class="admin-filter-field">
+                <label for="reservation-status-filter" class="form-label">وضعیت</label>
+                <select id="reservation-status-filter" class="form-select">
+                    <option value="ALL">همه وضعیت‌ها</option>
+                    <option value="RESERVED">رزرو شده</option>
+                    <option value="CANCELLED">لغوشده</option>
+                    <option value="USED">استفاده‌شده</option>
+                    <option value="NO_SHOW">عدم مراجعه</option>
+                </select>
+            </div>
+            <div class="admin-filter-field">
+                <label for="reservation-student-search" class="form-label">دانشجو</label>
+                <input id="reservation-student-search" type="search" class="form-control" placeholder="نام، کد دانشجویی یا موبایل">
+            </div>
+        </div>
+    </section>
+
+    <section class="panel-card panel-card--stretch">
+        <div class="section-heading">
+            <div>
+                <h2 class="section-heading__title">فهرست رزروها</h2>
+                <p class="section-heading__subtitle">در صورت نبود فیلتر سمت backend، فیلترهای تکمیلی به‌صورت client-side اعمال می‌شوند.</p>
+            </div>
+        </div>
+        <div class="table-responsive admin-table-shell">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col">دانشجو</th>
+                        <th scope="col">کد دانشجویی</th>
+                        <th scope="col">موبایل</th>
+                        <th scope="col">غذا</th>
+                        <th scope="col">تاریخ</th>
+                        <th scope="col">کد رزرو</th>
+                        <th scope="col">وضعیت</th>
+                        <th scope="col">ایجاد</th>
+                        <th scope="col">جزئیات</th>
+                    </tr>
+                </thead>
+                <tbody id="reservations-table-body">
+                    <tr>
+                        <td colspan="9" class="text-center py-4">در حال دریافت اطلاعات...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="reservations-pagination" class="mt-3"></div>
+    </section>
+
+    <div class="modal fade" id="reservationDetailModal" tabindex="-1" aria-labelledby="reservationDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="reservationDetailModalLabel">جزئیات رزرو</h2>
+                    <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="بستن"></button>
+                </div>
+                <div class="modal-body" id="reservation-detail-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">بستن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

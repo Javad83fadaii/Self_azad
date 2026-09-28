@@ -89,6 +89,42 @@ class MealAdminPermissionApiTests(TestCase):
         self.assertEqual(len(meals_response.data), 1)
         self.assertEqual(len(schedules_response.data), 1)
 
+    def test_student_cannot_access_admin_meal_list(self) -> None:
+        response = self.student_client.get("/api/admin/meals/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_admin_can_deactivate_meal(self) -> None:
+        meal = create_meal()
+
+        delete_response = self.admin_client.delete(f"/api/meals/{meal.id}/")
+        meal.refresh_from_db()
+
+        self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(meal.is_active)
+
+    def test_admin_can_update_schedule(self) -> None:
+        meal = create_meal()
+        schedule = create_schedule(meal=meal, capacity=10)
+
+        response = self.admin_client.put(
+            f"/api/schedules/{schedule.id}/",
+            {
+                "meal_id": meal.id,
+                "date": schedule.date.isoformat(),
+                "capacity": 42,
+                "reservation_open_at": schedule.reservation_open_at.isoformat(),
+                "reservation_close_at": schedule.reservation_close_at.isoformat(),
+                "is_active": True,
+            },
+            format="json",
+        )
+        schedule.refresh_from_db()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["capacity"], 42)
+        self.assertEqual(schedule.capacity, 42)
+
     def test_admin_can_create_and_deactivate_schedule(self) -> None:
         meal = create_meal()
         future_date = timezone.localdate() + timedelta(days=5)

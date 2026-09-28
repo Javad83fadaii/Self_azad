@@ -1,0 +1,75 @@
+{% extends "web/admin/base.html" %}
+
+{% block title %}مدیریت دانشجویان | سامانه رزرو غذا{% endblock %}
+
+{% block admin_content %}
+<div
+    id="admin-students-page"
+    data-list-url="{% url 'students:admin-student-list' %}"
+    data-reservations-url="{% url 'reservations:reservation-admin-list' %}"
+>
+    <div id="admin-students-feedback" class="d-none mb-4" aria-live="polite"></div>
+
+    <section class="admin-toolbar-card mb-4">
+        <div class="admin-filter-grid admin-filter-grid--wide">
+            <div class="admin-filter-field">
+                <label for="student-search" class="form-label">جستجوی دانشجو</label>
+                <input id="student-search" type="search" class="form-control" placeholder="نام، نام خانوادگی، کد دانشجویی یا موبایل">
+            </div>
+            <div class="admin-filter-field">
+                <label for="student-status-filter" class="form-label">وضعیت</label>
+                <select id="student-status-filter" class="form-select">
+                    <option value="ALL">همه</option>
+                    <option value="ACTIVE">فعال</option>
+                    <option value="INACTIVE">غیرفعال</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel-card panel-card--stretch">
+        <div class="section-heading">
+            <div>
+                <h2 class="section-heading__title">فهرست دانشجویان</h2>
+                <p class="section-heading__subtitle">جستجو و مشاهده رزروهای اخیر هر دانشجو.</p>
+            </div>
+        </div>
+        <div class="table-responsive admin-table-shell">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col">نام</th>
+                        <th scope="col">کد دانشجویی</th>
+                        <th scope="col">موبایل</th>
+                        <th scope="col">وضعیت</th>
+                        <th scope="col">نام کاربری</th>
+                        <th scope="col">تاریخ ثبت</th>
+                        <th scope="col">جزئیات</th>
+                    </tr>
+                </thead>
+                <tbody id="students-table-body">
+                    <tr>
+                        <td colspan="7" class="text-center py-4">در حال دریافت اطلاعات...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="students-pagination" class="mt-3"></div>
+    </section>
+
+    <div class="modal fade" id="studentDetailModal" tabindex="-1" aria-labelledby="studentDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="studentDetailModalLabel">جزئیات دانشجو</h2>
+                    <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="بستن"></button>
+                </div>
+                <div class="modal-body" id="student-detail-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">بستن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,19 +1,15 @@
 import { consumeLoginMessage, ensureCsrfToken, extractErrorMessage, post } from "../core/http.js";
 
-const form = document.querySelector("#student-login-form");
-const feedback = document.querySelector("#login-feedback");
-const submitButton = document.querySelector("#login-submit");
-
-function showFeedback(message, level = "danger") {
+function showFeedback(feedback, message, level = "danger") {
     feedback.className = `alert alert-${level}`;
     feedback.textContent = message;
 }
 
-function setLoading(isLoading) {
+function setLoading(submitButton, isLoading, idleLabel, loadingLabel) {
     submitButton.disabled = isLoading;
     const label = submitButton.querySelector(".login-submit__label");
     if (label) {
-        label.textContent = isLoading ? "در حال ورود..." : "ورود به سامانه";
+        label.textContent = isLoading ? loadingLabel : idleLabel;
     }
 }
 
@@ -23,17 +19,21 @@ function validateField(field) {
     return isValid;
 }
 
-function validateForm() {
-    return [form.student_code, form.phone_number].every(validateField);
+function validateForm(form) {
+    return Array.from(form.querySelectorAll("input[required]")).every(validateField);
 }
 
-if (form && feedback && submitButton) {
-    const loginMessage = consumeLoginMessage();
-    if (loginMessage) {
-        showFeedback(loginMessage, "warning");
+function bindLoginForm(form) {
+    const feedback = form.parentElement.querySelector("[data-login-feedback]");
+    const submitButton = form.querySelector("button[type='submit']");
+    if (!feedback || !submitButton) {
+        return;
     }
 
-    [form.student_code, form.phone_number].forEach((field) => {
+    const idleLabel = submitButton.querySelector(".login-submit__label")?.textContent?.trim() || "ورود";
+    const loadingLabel = "در حال ورود...";
+
+    form.querySelectorAll("input[required]").forEach((field) => {
         field.addEventListener("input", () => {
             validateField(field);
         });
@@ -41,32 +41,38 @@ if (form && feedback && submitButton) {
 
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
-        if (!validateForm()) {
-            showFeedback("کد دانشجویی و شماره موبایل را وارد کنید.", "warning");
+        if (!validateForm(form)) {
+            showFeedback(feedback, "لطفاً همه فیلدهای ضروری را تکمیل کنید.", "warning");
             return;
         }
 
-        setLoading(true);
-        feedback.className = "d-none";
+        setLoading(submitButton, true, idleLabel, loadingLabel);
+        feedback.className = "alert d-none";
         feedback.textContent = "";
 
         try {
             await ensureCsrfToken(form.dataset.csrfUrl);
-            await post(
-                form.dataset.loginUrl,
-                {
-                    student_code: form.student_code.value.trim(),
-                    phone_number: form.phone_number.value.trim(),
-                },
-                {
-                    csrfUrl: form.dataset.csrfUrl,
-                },
-            );
+            const payload = Object.fromEntries(new window.FormData(form).entries());
+            await post(form.dataset.loginUrl, payload, { csrfUrl: form.dataset.csrfUrl });
             window.location.assign(form.dataset.successUrl);
         } catch (error) {
-            showFeedback(extractErrorMessage(error));
+            showFeedback(feedback, extractErrorMessage(error));
         } finally {
-            setLoading(false);
+            setLoading(submitButton, false, idleLabel, loadingLabel);
         }
     });
+}
+
+const forms = document.querySelectorAll("[data-web-login-form]");
+
+if (forms.length) {
+    const loginMessage = consumeLoginMessage();
+    if (loginMessage) {
+        const firstFeedback = document.querySelector("[data-login-feedback]");
+        if (firstFeedback) {
+            showFeedback(firstFeedback, loginMessage, "warning");
+        }
+    }
+
+    forms.forEach(bindLoginForm);
 }

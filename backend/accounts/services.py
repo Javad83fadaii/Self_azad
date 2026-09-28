@@ -77,6 +77,13 @@ def login_student_for_web(*, student_code: str, phone_number: str) -> Student:
     return student
 
 
+def login_admin_for_web(*, username: str, password: str) -> User:
+    user = authenticate(username=username.strip(), password=password)
+    if user is None or not user.is_active or user.role != UserRole.ADMIN:
+        raise serializers.ValidationError({"detail": INVALID_LOGIN_MESSAGE})
+    return user
+
+
 def build_current_user_payload(*, user: User) -> dict[str, object]:
     student_profile = getattr(user, "student_profile", None)
     payload: dict[str, object] = {

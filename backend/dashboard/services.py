@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from meals.models import MealSchedule
 from reservations.models import Reservation, ReservationStatus
+from students.models import Student
 
 OCCUPIED_STATUSES = [
     ReservationStatus.RESERVED,
@@ -27,6 +28,8 @@ def resolve_dashboard_range(*, start_date=None, end_date=None):
 def get_dashboard_data(*, start_date=None, end_date=None) -> dict:
     start_date, end_date = resolve_dashboard_range(start_date=start_date, end_date=end_date)
     current_tz = timezone.get_current_timezone()
+    today = timezone.localdate()
+    now = timezone.localtime(timezone.now())
     start_dt = timezone.make_aware(datetime.combine(start_date, time.min), current_tz)
     end_dt = timezone.make_aware(datetime.combine(end_date + timedelta(days=1), time.min), current_tz)
 
@@ -106,9 +109,64 @@ def get_dashboard_data(*, start_date=None, end_date=None) -> dict:
         for date in sorted(cancelled_reservations_counts)
     ]
 
+    today_schedules = (
+        MealSchedule.objects.select_related("meal")
+        .filter(date=today)
+        .annotate(
+            reservation_count=Count(
+                "reservations",
+                filter=Q(reservations__status__in=OCCUPIED_STATUSES),
+            )
+        )
+        .order_by("meal__name")
+    )
+    today_meals = []
+    for schedule in today_schedules:
+        remaining_capacity = max(schedule.capacity - schedule.reservation_count, 0)
+        if not schedule.is_active or not schedule.meal.is_active:
+            reservation_state = "INACTIVE"
+        elif now < schedule.reservation_open_at:
+            reservation_state = "NOT_OPEN"
+        elif now > schedule.reservation_close_at:
+            reservation_state = "CLOSED"
+        elif remaining_capacity <= 0:
+            reservation_state = "FULL"
+        else:
+            reservation_state = "AVAILABLE"
+
+        today_meals.append(
+            {
+                "schedule_id": schedule.id,
+                "date": schedule.date,
+                "meal_id": schedule.meal_id,
+                "meal_name": schedule.meal.name,
+                "capacity": schedule.capacity,
+                "reservation_count": schedule.reservation_count,
+                "remaining_capacity": remaining_capacity,
+                "reservation_state": reservation_state,
+                "is_active": schedule.is_active and schedule.meal.is_active,
+            }
+        )
+
+    summary = {
+        "total_students": Student.objects.filter(is_active=True).count(),
+        "today_reservations": Reservation.objects.filter(
+            meal_schedule__date=today,
+            status__in=OCCUPIED_STATUSES,
+        ).count(),
+        "today_meals": len(today_meals),
+        "upcoming_reservations": Reservation.objects.filter(
+            meal_schedule__date__gt=today,
+            status=ReservationStatus.RESERVED,
+        ).count(),
+    }
+
     return {
+        "current_date": today,
         "start_date": start_date,
         "end_date": end_date,
+        "summary": summary,
+        "today_meals": today_meals,
         "charts": {
             "reservations_by_day": reservations_by_day,
             "popular_meals": popular_meals,

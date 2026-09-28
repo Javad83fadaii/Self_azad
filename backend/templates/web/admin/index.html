@@ -1,72 +1,167 @@
 {% extends "web/admin/base.html" %}
+{% load static %}
 
-{% block title %}فضای ادمین | سامانه رزرو غذا{% endblock %}
+{% block title %}داشبورد مدیریت | سامانه رزرو غذا{% endblock %}
 
 {% block admin_content %}
-{% include "web/components/alert.html" with level="warning" title="Placeholder Dashboard" message=admin_notice extra_classes="mb-4" %}
+<div
+    id="admin-dashboard-page"
+    data-dashboard-url="{% url 'dashboard:admin-dashboard' %}"
+    data-reservations-url="{% url 'reservations:reservation-admin-list' %}"
+    data-by-date-url="{% url 'reservations:reservation-by-date' %}"
+>
+    <div id="admin-dashboard-feedback" class="d-none mb-4" aria-live="polite"></div>
 
-<section class="stats-grid admin-stats-grid" aria-label="آمار اولیه مدیریت">
-    {% for stat in admin_stats %}
-        <article class="stat-card stat-card--{{ stat.tone }}">
+    <section class="stats-grid admin-stats-grid" aria-label="کارت‌های آماری مدیریت">
+        <article class="stat-card">
             <div class="stat-card__header">
-                <span class="stat-card__label">{{ stat.label }}</span>
-                {% include "web/components/badge.html" with tone=stat.tone label="در انتظار API" %}
+                <span class="stat-card__label"><i class="fa-solid fa-user-graduate me-2"></i>دانشجویان فعال</span>
+                <span class="status-badge status-badge--primary">Real API</span>
             </div>
-            <strong class="stat-card__value">{{ stat.value }}</strong>
-            <p class="stat-card__note">{{ stat.note }}</p>
+            <strong class="stat-card__value" data-summary="total_students">در حال بارگذاری...</strong>
+            <p class="stat-card__note">تعداد دانشجویان فعال ثبت‌شده در سامانه.</p>
         </article>
-    {% endfor %}
-</section>
-
-<section class="admin-dashboard-grid">
-    <article class="panel-card panel-card--stretch">
-        <div class="section-heading">
-            <div>
-                <h2 class="section-heading__title">رزروهای اخیر</h2>
-                <p class="section-heading__subtitle">جدول نمونه برای تست استایل، RTL و وضعیت‌های صفحه</p>
+        <article class="stat-card">
+            <div class="stat-card__header">
+                <span class="stat-card__label"><i class="fa-solid fa-clipboard-check me-2"></i>رزروهای امروز</span>
+                <span class="status-badge status-badge--success">امروز</span>
             </div>
-            {% include "web/components/button.html" with variant="outline-primary" label="گزارش‌ها در فاز بعد" icon="fa-solid fa-chart-column" disabled=True %}
-        </div>
+            <strong class="stat-card__value" data-summary="today_reservations">در حال بارگذاری...</strong>
+            <p class="stat-card__note">رزروهای فعال و مصرف‌شده روز جاری.</p>
+        </article>
+        <article class="stat-card">
+            <div class="stat-card__header">
+                <span class="stat-card__label"><i class="fa-solid fa-bowl-food me-2"></i>غذاهای امروز</span>
+                <span class="status-badge status-badge--warning">برنامه امروز</span>
+            </div>
+            <strong class="stat-card__value" data-summary="today_meals">در حال بارگذاری...</strong>
+            <p class="stat-card__note">تعداد غذاهای برنامه‌ریزی‌شده برای امروز.</p>
+        </article>
+        <article class="stat-card">
+            <div class="stat-card__header">
+                <span class="stat-card__label"><i class="fa-solid fa-calendar-plus me-2"></i>رزروهای آینده</span>
+                <span class="status-badge status-badge--info">پیش‌رو</span>
+            </div>
+            <strong class="stat-card__value" data-summary="upcoming_reservations">در حال بارگذاری...</strong>
+            <p class="stat-card__note">رزروهای فعال برای تاریخ‌های آینده.</p>
+        </article>
+    </section>
 
-        <div class="table-responsive admin-table-shell">
-            <table class="table table-hover align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th scope="col">دانشجو</th>
-                        <th scope="col">وعده</th>
-                        <th scope="col">وضعیت</th>
-                        <th scope="col">تاریخ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in admin_recent_reservations %}
+    <section class="admin-toolbar-card mb-4">
+        <form class="row g-3 align-items-end" id="dashboard-range-form">
+            <div class="col-12 col-md-4">
+                <label for="dashboard-start-date" class="form-label">از تاریخ</label>
+                <input type="date" class="form-control" id="dashboard-start-date" name="start_date">
+            </div>
+            <div class="col-12 col-md-4">
+                <label for="dashboard-end-date" class="form-label">تا تاریخ</label>
+                <input type="date" class="form-control" id="dashboard-end-date" name="end_date">
+            </div>
+            <div class="col-12 col-md-4 d-flex gap-2 flex-wrap">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-filter"></i>
+                    <span>اعمال بازه</span>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="dashboard-reset-range">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>بازه پیش‌فرض</span>
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="admin-dashboard-layout">
+        <article class="panel-card panel-card--stretch">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">خلاصه غذاهای امروز</h2>
+                    <p class="section-heading__subtitle">ظرفیت، تعداد رزرو و وضعیت هر غذای امروز.</p>
+                </div>
+            </div>
+            <div class="table-responsive admin-table-shell">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
                         <tr>
-                            <td>{{ item.student }}</td>
-                            <td>{{ item.meal }}</td>
-                            <td>{% include "web/components/badge.html" with tone="warning" label=item.status %}</td>
-                            <td>{{ item.date }}</td>
+                            <th scope="col">غذا</th>
+                            <th scope="col">تاریخ</th>
+                            <th scope="col">رزرو</th>
+                            <th scope="col">ظرفیت</th>
+                            <th scope="col">باقی‌مانده</th>
+                            <th scope="col">وضعیت</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        {% include "web/components/pagination.html" with extra_classes="mt-3" %}
-    </article>
-
-    <article class="panel-card">
-        <div class="section-heading">
-            <div>
-                <h2 class="section-heading__title">وضعیت دریافت داده</h2>
-                <p class="section-heading__subtitle">Loading، Empty و Error برای صفحات بعدی از همین الگو استفاده می‌کنند.</p>
+                    </thead>
+                    <tbody id="dashboard-today-meals-body">
+                        <tr>
+                            <td colspan="6" class="text-center py-4">در حال دریافت اطلاعات...</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
+        </article>
 
-        <div class="admin-state-stack">
-            {% include "web/components/loading.html" with message="در حال دریافت اطلاعات..." %}
-            {% include "web/components/empty_state.html" with icon="fa-regular fa-rectangle-list" title="داده‌ای برای گزارش وجود ندارد." message="وقتی ماژول گزارش‌ها پیاده‌سازی شود، داده‌های واقعی در این بخش قرار می‌گیرند." %}
-            {% include "web/components/alert.html" with level="danger" title="نمونه حالت خطا" message="دریافت اطلاعات با مشکل مواجه شد." %}
-        </div>
-    </article>
-</section>
+        <article class="panel-card panel-card--stretch">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">رزروهای امروز</h2>
+                    <p class="section-heading__subtitle">آخرین رزروهای ثبت‌شده برای تاریخ جاری.</p>
+                </div>
+            </div>
+            <div class="table-responsive admin-table-shell">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">دانشجو</th>
+                            <th scope="col">کد</th>
+                            <th scope="col">غذا</th>
+                            <th scope="col">کد رزرو</th>
+                            <th scope="col">وضعیت</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dashboard-reservations-body">
+                        <tr>
+                            <td colspan="5" class="text-center py-4">در حال دریافت اطلاعات...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="dashboard-reservations-pagination" class="mt-3"></div>
+        </article>
+    </section>
+
+    <section class="admin-chart-grid mt-4">
+        <article class="panel-card panel-card--stretch">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">تعداد رزرو غذاها</h2>
+                    <p class="section-heading__subtitle">غذاهای محبوب بازه انتخابی.</p>
+                </div>
+            </div>
+            <div class="chart-card__canvas">
+                <canvas id="popular-meals-chart" aria-label="نمودار تعداد رزرو غذاها"></canvas>
+            </div>
+        </article>
+        <article class="panel-card panel-card--stretch">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">روند رزروهای روزانه</h2>
+                    <p class="section-heading__subtitle">تعداد رزرو ثبت‌شده در هر روز.</p>
+                </div>
+            </div>
+            <div class="chart-card__canvas">
+                <canvas id="daily-reservations-chart" aria-label="نمودار رزروهای روزانه"></canvas>
+            </div>
+        </article>
+        <article class="panel-card panel-card--stretch">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">وضعیت رزروها</h2>
+                    <p class="section-heading__subtitle">مقایسه رزروهای ثبت‌شده و لغوشده.</p>
+                </div>
+            </div>
+            <div class="chart-card__canvas">
+                <canvas id="reservation-status-chart" aria-label="نمودار وضعیت رزروها"></canvas>
+            </div>
+        </article>
+    </section>
+</div>
 {% endblock %}

@@ -99,6 +99,29 @@ class WebUiShellTests(TestCase):
         self.assertContains(response, "داشبورد مدیریت")
         self.assertContains(response, "پنل مدیریت")
 
+    def test_admin_can_open_all_admin_pages(self) -> None:
+        admin_user = create_admin_account()
+        self.client.force_login(admin_user)
+
+        responses = {
+            "meals": self.client.get("/admin/meals/"),
+            "schedules": self.client.get("/admin/schedules/"),
+            "reservations": self.client.get("/admin/reservations/"),
+            "students": self.client.get("/admin/students/"),
+            "reports": self.client.get("/admin/reports/"),
+            "settings": self.client.get("/admin/settings/"),
+        }
+
+        for response in responses.values():
+            self.assertEqual(response.status_code, 200)
+
+        self.assertContains(responses["meals"], "مدیریت غذاها")
+        self.assertContains(responses["schedules"], "مدیریت برنامه غذایی")
+        self.assertContains(responses["reservations"], "مدیریت رزروها")
+        self.assertContains(responses["students"], "مدیریت دانشجویان")
+        self.assertContains(responses["reports"], "گزارش‌ها")
+        self.assertContains(responses["settings"], "تنظیمات")
+
     def test_student_cannot_access_admin_dashboard(self) -> None:
         student_user, _ = create_student_account()
         self.client.force_login(student_user)
@@ -106,6 +129,21 @@ class WebUiShellTests(TestCase):
         response = self.client.get("/admin/")
 
         self.assertEqual(response.status_code, 403)
+
+    def test_student_cannot_access_other_admin_pages(self) -> None:
+        student_user, _ = create_student_account()
+        self.client.force_login(student_user)
+
+        for path in (
+            "/admin/meals/",
+            "/admin/schedules/",
+            "/admin/reservations/",
+            "/admin/students/",
+            "/admin/reports/",
+            "/admin/settings/",
+        ):
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 403)
 
     def test_admin_cannot_access_student_dashboard(self) -> None:
         admin_user = create_admin_account()

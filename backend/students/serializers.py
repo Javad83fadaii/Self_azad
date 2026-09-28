@@ -19,4 +19,6 @@ class StudentProfileSerializer(serializers.ModelSerializer):
             "is_active",
             "username",
             "role",
+            "created_at",
+            "updated_at",
         ]

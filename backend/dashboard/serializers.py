@@ -44,6 +44,25 @@ class CancelledReservationPointSerializer(serializers.Serializer):
     cancelled_count = serializers.IntegerField()
 
 
+class DashboardSummarySerializer(serializers.Serializer):
+    total_students = serializers.IntegerField()
+    today_reservations = serializers.IntegerField()
+    today_meals = serializers.IntegerField()
+    upcoming_reservations = serializers.IntegerField()
+
+
+class TodayMealSummarySerializer(serializers.Serializer):
+    schedule_id = serializers.IntegerField()
+    date = serializers.DateField()
+    meal_id = serializers.IntegerField()
+    meal_name = serializers.CharField()
+    capacity = serializers.IntegerField()
+    reservation_count = serializers.IntegerField()
+    remaining_capacity = serializers.IntegerField()
+    reservation_state = serializers.CharField()
+    is_active = serializers.BooleanField()
+
+
 class DashboardChartsSerializer(serializers.Serializer):
     reservations_by_day = ReservationsByDayPointSerializer(many=True)
     popular_meals = PopularMealPointSerializer(many=True)
@@ -53,6 +72,9 @@ class DashboardChartsSerializer(serializers.Serializer):
 
 
 class DashboardResponseSerializer(serializers.Serializer):
+    current_date = serializers.DateField()
     start_date = serializers.DateField()
     end_date = serializers.DateField()
+    summary = DashboardSummarySerializer()
+    today_meals = TodayMealSummarySerializer(many=True)
     charts = DashboardChartsSerializer()

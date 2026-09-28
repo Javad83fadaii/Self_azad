@@ -67,6 +67,7 @@ class DashboardApiTests(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["current_date"], timezone.localdate().isoformat())
         self.assertEqual(response.data["start_date"], timezone.localdate().isoformat())
         self.assertIn("charts", response.data)
         self.assertEqual(len(response.data["charts"]["capacity_vs_reservations"]), 2)
@@ -74,6 +75,31 @@ class DashboardApiTests(TestCase):
         self.assertEqual(response.data["charts"]["popular_meals"][0]["total_reservations"], 2)
         self.assertEqual(response.data["charts"]["reservations_by_day"][0]["reservation_count"], 2)
         self.assertEqual(response.data["charts"]["cancelled_reservations"][0]["cancelled_count"], 1)
+
+    def test_dashboard_returns_summary_and_today_meals(self) -> None:
+        today_schedule = create_schedule(meal=self.meal_one, days_offset=0, capacity=5)
+        Reservation.objects.create(
+            reservation_code="RSV-DSH-TODAY",
+            student=self.student,
+            meal_schedule=today_schedule,
+            status=ReservationStatus.RESERVED,
+        )
+
+        response = self.admin_client.get("/api/admin/dashboard/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["summary"]["total_students"], 2)
+        self.assertEqual(response.data["summary"]["today_reservations"], 1)
+        self.assertEqual(response.data["summary"]["today_meals"], 1)
+        self.assertEqual(response.data["summary"]["upcoming_reservations"], 1)
+
+        today_meals = response.data["today_meals"]
+        self.assertEqual(len(today_meals), 1)
+        self.assertEqual(today_meals[0]["meal_name"], "Ghormeh Sabzi")
+        self.assertEqual(today_meals[0]["reservation_count"], 1)
+        self.assertEqual(today_meals[0]["remaining_capacity"], 4)
+        self.assertEqual(today_meals[0]["reservation_state"], "AVAILABLE")
+        self.assertTrue(today_meals[0]["is_active"])
 
     def test_student_cannot_access_dashboard(self) -> None:
         response = self.student_client.get("/api/admin/dashboard/")

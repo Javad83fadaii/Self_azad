@@ -11,6 +11,10 @@ function isSafeMethod(method) {
     return ["GET", "HEAD", "OPTIONS", "TRACE"].includes(String(method).toUpperCase());
 }
 
+function isFormDataPayload(data) {
+    return typeof window !== "undefined" && data instanceof window.FormData;
+}
+
 async function parseResponseBody(response) {
     const contentType = response.headers.get("content-type") || "";
     if (!contentType.includes("application/json")) {
@@ -118,8 +122,13 @@ export async function request(url, options = {}) {
     };
 
     if (data !== undefined) {
-        requestHeaders["Content-Type"] = "application/json";
-        config.body = JSON.stringify(data);
+        if (isFormDataPayload(data)) {
+            config.body = data;
+            delete requestHeaders["Content-Type"];
+        } else {
+            requestHeaders["Content-Type"] = "application/json";
+            config.body = JSON.stringify(data);
+        }
     }
 
     if (withCsrf) {

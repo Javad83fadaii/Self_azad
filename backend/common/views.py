@@ -35,17 +35,17 @@ STUDENT_NAV_ITEMS = [
 
 ADMIN_NAV_ITEMS = [
     {"label": "داشبورد", "url_name": "common:web-admin-home", "icon": "fa-solid fa-gauge", "key": "admin-dashboard"},
-    {"label": "غذاها", "url_name": "common:web-admin-home", "icon": "fa-solid fa-bowl-food", "key": "admin-meals"},
+    {"label": "غذاها", "url_name": "common:web-admin-meals", "icon": "fa-solid fa-bowl-food", "key": "admin-meals"},
     {
         "label": "برنامه غذایی",
-        "url_name": "common:web-admin-home",
+        "url_name": "common:web-admin-schedules",
         "icon": "fa-solid fa-calendar-days",
         "key": "admin-schedules",
     },
-    {"label": "رزروها", "url_name": "common:web-admin-home", "icon": "fa-solid fa-clipboard-list", "key": "admin-reservations"},
-    {"label": "دانشجویان", "url_name": "common:web-admin-home", "icon": "fa-solid fa-user-graduate", "key": "admin-students"},
-    {"label": "گزارش‌ها", "url_name": "common:web-admin-home", "icon": "fa-solid fa-chart-column", "key": "admin-reports"},
-    {"label": "تنظیمات", "url_name": "common:web-admin-home", "icon": "fa-solid fa-gear", "key": "admin-settings"},
+    {"label": "رزروها", "url_name": "common:web-admin-reservations", "icon": "fa-solid fa-clipboard-list", "key": "admin-reservations"},
+    {"label": "دانشجویان", "url_name": "common:web-admin-students", "icon": "fa-solid fa-user-graduate", "key": "admin-students"},
+    {"label": "گزارش‌ها", "url_name": "common:web-admin-reports", "icon": "fa-solid fa-chart-column", "key": "admin-reports"},
+    {"label": "تنظیمات", "url_name": "common:web-admin-settings", "icon": "fa-solid fa-gear", "key": "admin-settings"},
 ]
 
 
@@ -99,6 +99,13 @@ def build_student_page_context(*, user, heading: str, subtitle: str) -> dict[str
     }
 
 
+def build_admin_page_context(*, heading: str, subtitle: str) -> dict[str, str]:
+    return {
+        "page_heading": heading,
+        "page_subtitle": subtitle,
+    }
+
+
 class WebEntryRedirectView(View):
     """Redirect the project root to the initial web login page."""
 
@@ -129,8 +136,8 @@ class StudentLoginPageView(TemplateView):
             {
                 "web_app_name": "سامانه رزرو غذای دانشگاه",
                 "web_brand_subtitle": "سامانه رزرو غذای دانشجویان",
-                "login_title": "ورود دانشجو",
-                "login_description": "برای ورود به نسخه وب، کد دانشجویی و شماره موبایل خود را وارد کنید.",
+                "login_title": "ورود به سامانه",
+                "login_description": "دانشجویان با کد دانشجویی و موبایل و مدیران با نام کاربری و رمز عبور وارد نسخه وب می‌شوند.",
             }
         )
         return context
@@ -254,8 +261,8 @@ class StudentProfilePageView(RoleProtectedTemplateView):
         return context
 
 
-class AdminHomePlaceholderView(RoleProtectedTemplateView):
-    """Render the admin placeholder page until the admin panel is built."""
+class AdminHomeView(RoleProtectedTemplateView):
+    """Render the admin dashboard page."""
 
     expected_role = UserRole.ADMIN
     active_section = "admin-dashboard"
@@ -265,49 +272,116 @@ class AdminHomePlaceholderView(RoleProtectedTemplateView):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "page_heading": "داشبورد مدیریت",
-                "page_subtitle": "این صفحه در فاز ۳ برای نمایش shell مدیریتی، sidebar، table و stateها آماده شده است.",
-                "admin_notice": "برای جلوگیری از نمایش اطلاعات نادرست، آمار این صفحه به‌صورت Placeholder علامت‌گذاری شده‌اند.",
-                "admin_recent_reservations": [
-                    {
-                        "student": "نمونه رابط کاربری",
-                        "meal": "اطلاعات بعداً از API",
-                        "status": "Placeholder",
-                        "date": "فاز بعد",
-                    },
-                    {
-                        "student": "نمونه جدول",
-                        "meal": "بدون داده واقعی",
-                        "status": "UI آماده است",
-                        "date": "فاز بعد",
-                    },
-                ],
-                "admin_stats": [
-                    build_placeholder_stat(
-                        label="تعداد دانشجویان",
-                        value="Placeholder",
-                        tone="primary",
-                        note="اطلاعات در فاز بعد از API دریافت خواهد شد.",
-                    ),
-                    build_placeholder_stat(
-                        label="رزروهای امروز",
-                        value="Placeholder",
-                        tone="success",
-                        note="در این فاز آمار واقعی به UI متصل نشده است.",
-                    ),
-                    build_placeholder_stat(
-                        label="غذاهای امروز",
-                        value="Placeholder",
-                        tone="warning",
-                        note="این کارت فقط برای تست UI و spacing ایجاد شده است.",
-                    ),
-                    build_placeholder_stat(
-                        label="رزروهای پیش‌رو",
-                        value="Placeholder",
-                        tone="info",
-                        note="گزارش و جزئیات واقعی در فاز بعد تکمیل می‌شود.",
-                    ),
-                ],
+                **build_admin_page_context(heading="داشبورد مدیریت", subtitle="آمار زنده، خلاصه غذاهای امروز و نمودارهای مدیریتی سامانه."),
+                "admin_page": "dashboard",
+            }
+        )
+        return context
+
+
+class AdminMealsView(RoleProtectedTemplateView):
+    """Render the admin meal management page."""
+
+    expected_role = UserRole.ADMIN
+    active_section = "admin-meals"
+    template_name = "web/admin/meals.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                **build_admin_page_context(heading="مدیریت غذاها", subtitle="مشاهده، جستجو، ایجاد، ویرایش و غیرفعال‌سازی غذاها از طریق APIهای موجود."),
+                "admin_page": "meals",
+            }
+        )
+        return context
+
+
+class AdminSchedulesView(RoleProtectedTemplateView):
+    """Render the admin schedule management page."""
+
+    expected_role = UserRole.ADMIN
+    active_section = "admin-schedules"
+    template_name = "web/admin/schedules.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                **build_admin_page_context(heading="مدیریت برنامه غذایی", subtitle="بررسی برنامه روزانه و هفتگی، ظرفیت‌ها و بازه‌های رزرو غذاها."),
+                "admin_page": "schedules",
+            }
+        )
+        return context
+
+
+class AdminReservationsView(RoleProtectedTemplateView):
+    """Render the admin reservation page."""
+
+    expected_role = UserRole.ADMIN
+    active_section = "admin-reservations"
+    template_name = "web/admin/reservations.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                **build_admin_page_context(heading="مدیریت رزروها", subtitle="مشاهده رزروهای دانشجویان، فیلتر بر اساس تاریخ و غذا و بررسی جزئیات هر رزرو."),
+                "admin_page": "reservations",
+            }
+        )
+        return context
+
+
+class AdminStudentsView(RoleProtectedTemplateView):
+    """Render the admin student page."""
+
+    expected_role = UserRole.ADMIN
+    active_section = "admin-students"
+    template_name = "web/admin/students.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                **build_admin_page_context(heading="مدیریت دانشجویان", subtitle="فهرست دانشجویان، جستجوی مدیریتی و مشاهده رزروهای اخیر هر دانشجو."),
+                "admin_page": "students",
+            }
+        )
+        return context
+
+
+class AdminReportsView(RoleProtectedTemplateView):
+    """Render the admin reports page."""
+
+    expected_role = UserRole.ADMIN
+    active_section = "admin-reports"
+    template_name = "web/admin/reports.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                **build_admin_page_context(heading="گزارش‌ها", subtitle="گزارش روزانه غذاها، گزارش دانشجویان و عملکرد غذاها همراه با نمودارهای پویا."),
+                "admin_page": "reports",
+            }
+        )
+        return context
+
+
+class AdminSettingsPlaceholderView(RoleProtectedTemplateView):
+    """Render the admin settings placeholder page."""
+
+    expected_role = UserRole.ADMIN
+    active_section = "admin-settings"
+    template_name = "web/admin/settings.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                **build_admin_page_context(heading="تنظیمات", subtitle="این بخش فعلاً به‌صورت placeholder نگه داشته شده و در فاز بعد تکمیل می‌شود."),
+                "admin_page": "settings",
             }
         )
         return context

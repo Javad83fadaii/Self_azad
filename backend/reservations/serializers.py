@@ -6,6 +6,10 @@ from reservations.models import Reservation, ReservationStatus
 class ReservationSerializer(serializers.ModelSerializer):
     student_id = serializers.IntegerField(source="student.id", read_only=True)
     student_code = serializers.CharField(source="student.student_code", read_only=True)
+    student_first_name = serializers.CharField(source="student.first_name", read_only=True)
+    student_last_name = serializers.CharField(source="student.last_name", read_only=True)
+    student_full_name = serializers.CharField(source="student.full_name", read_only=True)
+    student_phone_number = serializers.CharField(source="student.phone_number", read_only=True)
     meal_schedule_id = serializers.IntegerField(source="meal_schedule.id", read_only=True)
     meal_id = serializers.IntegerField(source="meal_schedule.meal.id", read_only=True)
     meal_name = serializers.CharField(source="meal_schedule.meal.name", read_only=True)
@@ -22,6 +26,10 @@ class ReservationSerializer(serializers.ModelSerializer):
             "reservation_code",
             "student_id",
             "student_code",
+            "student_first_name",
+            "student_last_name",
+            "student_full_name",
+            "student_phone_number",
             "meal_schedule_id",
             "meal_id",
             "meal_name",

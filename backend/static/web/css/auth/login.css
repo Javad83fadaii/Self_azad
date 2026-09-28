@@ -66,6 +66,23 @@
     margin-bottom: 1.75rem;
 }
 
+.login-tabs {
+    gap: 0.75rem;
+}
+
+.login-tabs .nav-link {
+    border-radius: 999px;
+    font-weight: 700;
+    color: var(--color-primary);
+    border: 1px solid rgba(31, 75, 153, 0.14);
+    background: rgba(31, 75, 153, 0.04);
+}
+
+.login-tabs .nav-link.active {
+    background: var(--color-primary);
+    color: #fff;
+}
+
 .login-card__badge {
     width: 4rem;
     height: 4rem;

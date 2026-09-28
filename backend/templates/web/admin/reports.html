@@ -1,0 +1,212 @@
+{% extends "web/admin/base.html" %}
+
+{% block title %}گزارش‌ها | سامانه رزرو غذا{% endblock %}
+
+{% block admin_content %}
+<div
+    id="admin-reports-page"
+    data-daily-url="{% url 'reports:admin-daily-meal-report' %}"
+    data-students-url="{% url 'reports:admin-student-report' %}"
+    data-meals-url="{% url 'reports:admin-meal-report' %}"
+>
+    <div id="admin-reports-feedback" class="d-none mb-4" aria-live="polite"></div>
+
+    <section class="admin-toolbar-card mb-4">
+        <form id="reports-filter-form" class="admin-filter-grid admin-filter-grid--wide">
+            <div class="admin-filter-field">
+                <label for="daily-report-date" class="form-label">تاریخ گزارش روزانه</label>
+                <input id="daily-report-date" name="date" type="date" class="form-control" required>
+            </div>
+            <div class="admin-filter-field">
+                <label for="student-report-first-name" class="form-label">نام دانشجو</label>
+                <input id="student-report-first-name" name="first_name" type="text" class="form-control" placeholder="مثلاً علی">
+            </div>
+            <div class="admin-filter-field">
+                <label for="student-report-last-name" class="form-label">نام خانوادگی</label>
+                <input id="student-report-last-name" name="last_name" type="text" class="form-control" placeholder="مثلاً احمدی">
+            </div>
+            <div class="admin-filter-field">
+                <label for="student-report-code" class="form-label">کد دانشجویی</label>
+                <input id="student-report-code" name="student_code" type="text" class="form-control">
+            </div>
+            <div class="admin-filter-field">
+                <label for="student-report-phone" class="form-label">شماره موبایل</label>
+                <input id="student-report-phone" name="phone_number" type="text" class="form-control">
+            </div>
+            <div class="admin-filter-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>دریافت گزارش</span>
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="admin-chart-grid">
+        <article class="panel-card panel-card--stretch">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">رزرو غذاها</h2>
+                    <p class="section-heading__subtitle">Bar Chart بر اساس گزارش عملکرد غذاها.</p>
+                </div>
+            </div>
+            <div class="chart-card__canvas">
+                <canvas id="reports-meals-chart" aria-label="نمودار رزرو غذاها"></canvas>
+            </div>
+        </article>
+        <article class="panel-card panel-card--stretch">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">روند گزارش روزانه</h2>
+                    <p class="section-heading__subtitle">Line Chart بر اساس ظرفیت و رزرو همان روز.</p>
+                </div>
+            </div>
+            <div class="chart-card__canvas">
+                <canvas id="reports-daily-chart" aria-label="نمودار گزارش روزانه"></canvas>
+            </div>
+        </article>
+        <article class="panel-card panel-card--stretch">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">وضعیت رزرو دانشجویان</h2>
+                    <p class="section-heading__subtitle">Doughnut Chart بر اساس وضعیت رزروهای گزارش دانشجویان.</p>
+                </div>
+            </div>
+            <div class="chart-card__canvas">
+                <canvas id="reports-students-chart" aria-label="نمودار وضعیت رزرو دانشجویان"></canvas>
+            </div>
+        </article>
+    </section>
+
+    <section class="admin-report-grid mt-4">
+        <article class="panel-card panel-card--stretch">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">گزارش روزانه غذاها</h2>
+                    <p class="section-heading__subtitle">آمار رزرو، ظرفیت و ظرفیت باقی‌مانده.</p>
+                </div>
+                <div class="admin-export-actions" role="group" aria-label="خروجی گزارش روزانه">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-export-report="daily" data-export-format="csv">
+                        <i class="fa-solid fa-file-csv" aria-hidden="true"></i>
+                        <span>CSV</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-export-report="daily" data-export-format="xlsx">
+                        <i class="fa-solid fa-file-excel" aria-hidden="true"></i>
+                        <span>Excel</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-export-report="daily" data-export-format="pdf">
+                        <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
+                        <span>PDF</span>
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive admin-table-shell">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">غذا</th>
+                            <th scope="col">رزرو</th>
+                            <th scope="col">لغوشده</th>
+                            <th scope="col">ظرفیت</th>
+                            <th scope="col">باقی‌مانده</th>
+                            <th scope="col">درصد استفاده</th>
+                        </tr>
+                    </thead>
+                    <tbody id="daily-report-body">
+                        <tr>
+                            <td colspan="6" class="text-center py-4">در حال دریافت اطلاعات...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="panel-card panel-card--stretch">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">گزارش دانشجویان</h2>
+                    <p class="section-heading__subtitle">خلاصه وضعیت رزرو برای هر دانشجو.</p>
+                </div>
+                <div class="admin-export-actions" role="group" aria-label="خروجی گزارش دانشجویان">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-export-report="students" data-export-format="csv">
+                        <i class="fa-solid fa-file-csv" aria-hidden="true"></i>
+                        <span>CSV</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-export-report="students" data-export-format="xlsx">
+                        <i class="fa-solid fa-file-excel" aria-hidden="true"></i>
+                        <span>Excel</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-export-report="students" data-export-format="pdf">
+                        <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
+                        <span>PDF</span>
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive admin-table-shell">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">دانشجو</th>
+                            <th scope="col">کد</th>
+                            <th scope="col">کل رزرو</th>
+                            <th scope="col">فعال</th>
+                            <th scope="col">لغوشده</th>
+                            <th scope="col">استفاده‌شده</th>
+                            <th scope="col">عدم مراجعه</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-report-body">
+                        <tr>
+                            <td colspan="7" class="text-center py-4">در حال دریافت اطلاعات...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="panel-card panel-card--stretch">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">گزارش عملکرد غذاها</h2>
+                    <p class="section-heading__subtitle">خلاصه تعداد رزرو و درصد استفاده هر غذا.</p>
+                </div>
+                <div class="admin-export-actions" role="group" aria-label="خروجی گزارش عملکرد غذاها">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-export-report="meals" data-export-format="csv">
+                        <i class="fa-solid fa-file-csv" aria-hidden="true"></i>
+                        <span>CSV</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-export-report="meals" data-export-format="xlsx">
+                        <i class="fa-solid fa-file-excel" aria-hidden="true"></i>
+                        <span>Excel</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-export-report="meals" data-export-format="pdf">
+                        <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
+                        <span>PDF</span>
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive admin-table-shell">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">غذا</th>
+                            <th scope="col">کد</th>
+                            <th scope="col">کل رزرو</th>
+                            <th scope="col">لغوشده</th>
+                            <th scope="col">استفاده‌شده</th>
+                            <th scope="col">عدم مراجعه</th>
+                            <th scope="col">ظرفیت</th>
+                            <th scope="col">درصد استفاده</th>
+                        </tr>
+                    </thead>
+                    <tbody id="meal-report-body">
+                        <tr>
+                            <td colspan="8" class="text-center py-4">در حال دریافت اطلاعات...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    </section>
+</div>
+{% endblock %}
