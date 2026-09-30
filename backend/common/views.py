@@ -9,6 +9,7 @@ from django.views.generic import TemplateView, View
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from accounts.models import UserRole
+from audit_logs.services import log_action
 
 
 STUDENT_NAV_ITEMS = [
@@ -45,6 +46,7 @@ ADMIN_NAV_ITEMS = [
     {"label": "رزروها", "url_name": "common:web-admin-reservations", "icon": "fa-solid fa-clipboard-list", "key": "admin-reservations"},
     {"label": "دانشجویان", "url_name": "common:web-admin-students", "icon": "fa-solid fa-user-graduate", "key": "admin-students"},
     {"label": "گزارش‌ها", "url_name": "common:web-admin-reports", "icon": "fa-solid fa-chart-column", "key": "admin-reports"},
+    {"label": "فعالیت‌ها", "url_name": "common:web-admin-activity", "icon": "fa-solid fa-clock-rotate-left", "key": "admin-activity"},
     {"label": "تنظیمات", "url_name": "common:web-admin-settings", "icon": "fa-solid fa-gear", "key": "admin-settings"},
 ]
 
@@ -261,10 +263,23 @@ class StudentProfilePageView(RoleProtectedTemplateView):
         return context
 
 
-class AdminHomeView(RoleProtectedTemplateView):
+class AdminTemplateView(RoleProtectedTemplateView):
+    expected_role = UserRole.ADMIN
+
+    def render_to_response(self, context, **response_kwargs):
+        response = super().render_to_response(context, **response_kwargs)
+        if response.status_code == 200:
+            log_action(
+                user=self.request.user,
+                action="ADMIN_PAGE_VIEW",
+                description=f"نمایش صفحه {context.get('page_heading', 'مدیریت')}",
+            )
+        return response
+
+
+class AdminHomeView(AdminTemplateView):
     """Render the admin dashboard page."""
 
-    expected_role = UserRole.ADMIN
     active_section = "admin-dashboard"
     template_name = "web/admin/index.html"
 
@@ -279,10 +294,9 @@ class AdminHomeView(RoleProtectedTemplateView):
         return context
 
 
-class AdminMealsView(RoleProtectedTemplateView):
+class AdminMealsView(AdminTemplateView):
     """Render the admin meal management page."""
 
-    expected_role = UserRole.ADMIN
     active_section = "admin-meals"
     template_name = "web/admin/meals.html"
 
@@ -297,10 +311,9 @@ class AdminMealsView(RoleProtectedTemplateView):
         return context
 
 
-class AdminSchedulesView(RoleProtectedTemplateView):
+class AdminSchedulesView(AdminTemplateView):
     """Render the admin schedule management page."""
 
-    expected_role = UserRole.ADMIN
     active_section = "admin-schedules"
     template_name = "web/admin/schedules.html"
 
@@ -315,10 +328,9 @@ class AdminSchedulesView(RoleProtectedTemplateView):
         return context
 
 
-class AdminReservationsView(RoleProtectedTemplateView):
+class AdminReservationsView(AdminTemplateView):
     """Render the admin reservation page."""
 
-    expected_role = UserRole.ADMIN
     active_section = "admin-reservations"
     template_name = "web/admin/reservations.html"
 
@@ -333,10 +345,9 @@ class AdminReservationsView(RoleProtectedTemplateView):
         return context
 
 
-class AdminStudentsView(RoleProtectedTemplateView):
+class AdminStudentsView(AdminTemplateView):
     """Render the admin student page."""
 
-    expected_role = UserRole.ADMIN
     active_section = "admin-students"
     template_name = "web/admin/students.html"
 
@@ -351,10 +362,9 @@ class AdminStudentsView(RoleProtectedTemplateView):
         return context
 
 
-class AdminReportsView(RoleProtectedTemplateView):
+class AdminReportsView(AdminTemplateView):
     """Render the admin reports page."""
 
-    expected_role = UserRole.ADMIN
     active_section = "admin-reports"
     template_name = "web/admin/reports.html"
 
@@ -369,10 +379,26 @@ class AdminReportsView(RoleProtectedTemplateView):
         return context
 
 
-class AdminSettingsPlaceholderView(RoleProtectedTemplateView):
+class AdminActivityView(AdminTemplateView):
+    """Render the admin activity page."""
+
+    active_section = "admin-activity"
+    template_name = "web/admin/activity.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                **build_admin_page_context(heading="گزارش فعالیت‌ها", subtitle="مشاهده رخدادهای مدیریتی ثبت‌شده با فیلتر کاربر، عمل و تاریخ."),
+                "admin_page": "activity",
+            }
+        )
+        return context
+
+
+class AdminSettingsPlaceholderView(AdminTemplateView):
     """Render the admin settings placeholder page."""
 
-    expected_role = UserRole.ADMIN
     active_section = "admin-settings"
     template_name = "web/admin/settings.html"
 

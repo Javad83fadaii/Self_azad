@@ -8,14 +8,19 @@
     data-daily-url="{% url 'reports:admin-daily-meal-report' %}"
     data-students-url="{% url 'reports:admin-student-report' %}"
     data-meals-url="{% url 'reports:admin-meal-report' %}"
+    data-reservations-url="{% url 'reports:admin-reservation-report' %}"
 >
     <div id="admin-reports-feedback" class="d-none mb-4" aria-live="polite"></div>
 
-    <section class="admin-toolbar-card mb-4">
+    <section class="admin-toolbar-card mb-4 report-print-scope">
         <form id="reports-filter-form" class="admin-filter-grid admin-filter-grid--wide">
             <div class="admin-filter-field">
-                <label for="daily-report-date" class="form-label">تاریخ گزارش روزانه</label>
-                <input id="daily-report-date" name="date" type="date" class="form-control" required>
+                <label for="report-start-date" class="form-label">از تاریخ</label>
+                <input id="report-start-date" name="start_date" type="date" class="form-control" required>
+            </div>
+            <div class="admin-filter-field">
+                <label for="report-end-date" class="form-label">تا تاریخ</label>
+                <input id="report-end-date" name="end_date" type="date" class="form-control" required>
             </div>
             <div class="admin-filter-field">
                 <label for="student-report-first-name" class="form-label">نام دانشجو</label>
@@ -38,16 +43,82 @@
                     <i class="fa-solid fa-chart-line"></i>
                     <span>دریافت گزارش</span>
                 </button>
+                <button type="button" class="btn btn-outline-secondary" id="reports-reset-filters">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>بازنشانی</span>
+                </button>
+                <button type="button" class="btn btn-outline-dark" id="reports-print-trigger">
+                    <i class="fa-solid fa-print"></i>
+                    <span>چاپ گزارش</span>
+                </button>
             </div>
         </form>
     </section>
 
-    <section class="admin-chart-grid">
+    <section class="stats-grid admin-stats-grid report-print-scope" aria-label="خلاصه گزارش‌ها">
+        <article class="stat-card">
+            <div class="stat-card__header">
+                <span class="stat-card__label"><i class="fa-solid fa-user-graduate me-2"></i>دانشجویان فعال</span>
+                <span class="status-badge status-badge--primary">Students</span>
+            </div>
+            <strong class="stat-card__value" data-report-summary="active_students">-</strong>
+            <p class="stat-card__note">تعداد دانشجویان فعال در گزارش انتخاب‌شده.</p>
+        </article>
+        <article class="stat-card">
+            <div class="stat-card__header">
+                <span class="stat-card__label"><i class="fa-solid fa-users me-2"></i>دانشجویان دارای رزرو</span>
+                <span class="status-badge status-badge--success">Participation</span>
+            </div>
+            <strong class="stat-card__value" data-report-summary="students_with_reservations">-</strong>
+            <p class="stat-card__note">دانشجویانی که در بازه انتخابی حداقل یک رزرو دارند.</p>
+        </article>
+        <article class="stat-card">
+            <div class="stat-card__header">
+                <span class="stat-card__label"><i class="fa-solid fa-clipboard-list me-2"></i>کل رزروها</span>
+                <span class="status-badge status-badge--warning">Reservations</span>
+            </div>
+            <strong class="stat-card__value" data-report-summary="total_reservations">-</strong>
+            <p class="stat-card__note">تعداد کل رزروهای گزارش رزروها در بازه انتخاب‌شده.</p>
+        </article>
+        <article class="stat-card">
+            <div class="stat-card__header">
+                <span class="stat-card__label"><i class="fa-solid fa-percent me-2"></i>درصد مشارکت</span>
+                <span class="status-badge status-badge--info">Rate</span>
+            </div>
+            <strong class="stat-card__value" data-report-summary="participation_rate">-</strong>
+            <p class="stat-card__note">درصد مشارکت دانشجویان در بازه انتخابی.</p>
+        </article>
+        <article class="stat-card">
+            <div class="stat-card__header">
+                <span class="stat-card__label"><i class="fa-solid fa-bowl-food me-2"></i>غذاهای دارای برنامه</span>
+                <span class="status-badge status-badge--primary">Meals</span>
+            </div>
+            <strong class="stat-card__value" data-report-summary="scheduled_meals">-</strong>
+            <p class="stat-card__note">تعداد دفعات ارائه غذا در بازه گزارش.</p>
+        </article>
+        <article class="stat-card">
+            <div class="stat-card__header">
+                <span class="stat-card__label"><i class="fa-solid fa-box-open me-2"></i>ظرفیت کل</span>
+                <span class="status-badge status-badge--success">Capacity</span>
+            </div>
+            <strong class="stat-card__value" data-report-summary="total_capacity">-</strong>
+            <p class="stat-card__note">مجموع ظرفیت برنامه‌های غذایی در بازه انتخابی.</p>
+        </article>
+    </section>
+
+    <section class="report-print-header d-none">
+        <h2 class="mb-2">دانشگاه - سامانه رزرو غذا</h2>
+        <p class="mb-1">عنوان گزارش: مرکز گزارش‌های مدیریتی</p>
+        <p class="mb-1">تاریخ تولید: <span id="print-generated-at">-</span></p>
+        <p class="mb-0">بازه گزارش: <span id="print-range-label">-</span></p>
+    </section>
+
+    <section class="admin-chart-grid report-print-scope">
         <article class="panel-card panel-card--stretch">
             <div class="section-heading">
                 <div>
-                    <h2 class="section-heading__title">رزرو غذاها</h2>
-                    <p class="section-heading__subtitle">Bar Chart بر اساس گزارش عملکرد غذاها.</p>
+                    <h2 class="section-heading__title">تعداد رزرو هر غذا</h2>
+                    <p class="section-heading__subtitle">Bar Chart بر اساس عملکرد غذاها در بازه انتخابی.</p>
                 </div>
             </div>
             <div class="chart-card__canvas">
@@ -57,8 +128,8 @@
         <article class="panel-card panel-card--stretch">
             <div class="section-heading">
                 <div>
-                    <h2 class="section-heading__title">روند گزارش روزانه</h2>
-                    <p class="section-heading__subtitle">Line Chart بر اساس ظرفیت و رزرو همان روز.</p>
+                    <h2 class="section-heading__title">روند رزرو در روزهای انتخاب‌شده</h2>
+                    <p class="section-heading__subtitle">Line Chart بر اساس تعداد رزرو ثبت‌شده برای هر روز.</p>
                 </div>
             </div>
             <div class="chart-card__canvas">
@@ -68,22 +139,22 @@
         <article class="panel-card panel-card--stretch">
             <div class="section-heading">
                 <div>
-                    <h2 class="section-heading__title">وضعیت رزرو دانشجویان</h2>
-                    <p class="section-heading__subtitle">Doughnut Chart بر اساس وضعیت رزروهای گزارش دانشجویان.</p>
+                    <h2 class="section-heading__title">توزیع وضعیت رزروها</h2>
+                    <p class="section-heading__subtitle">Doughnut Chart بر اساس وضعیت‌های واقعی رزرو در Backend.</p>
                 </div>
             </div>
             <div class="chart-card__canvas">
-                <canvas id="reports-students-chart" aria-label="نمودار وضعیت رزرو دانشجویان"></canvas>
+                <canvas id="reports-reservations-chart" aria-label="نمودار وضعیت رزروها"></canvas>
             </div>
         </article>
     </section>
 
-    <section class="admin-report-grid mt-4">
+    <section class="admin-report-grid mt-4 report-print-scope">
         <article class="panel-card panel-card--stretch">
             <div class="section-heading">
                 <div>
-                    <h2 class="section-heading__title">گزارش روزانه غذاها</h2>
-                    <p class="section-heading__subtitle">آمار رزرو، ظرفیت و ظرفیت باقی‌مانده.</p>
+                    <h2 class="section-heading__title">گزارش روزانه و بازه‌ای غذاها</h2>
+                    <p class="section-heading__subtitle">تاریخ، ظرفیت، رزرو، ظرفیت باقی‌مانده و درصد استفاده.</p>
                 </div>
                 <div class="admin-export-actions" role="group" aria-label="خروجی گزارش روزانه">
                     <button type="button" class="btn btn-sm btn-outline-secondary" data-export-report="daily" data-export-format="csv">
@@ -104,6 +175,7 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
+                            <th scope="col">تاریخ</th>
                             <th scope="col">غذا</th>
                             <th scope="col">رزرو</th>
                             <th scope="col">لغوشده</th>
@@ -114,7 +186,7 @@
                     </thead>
                     <tbody id="daily-report-body">
                         <tr>
-                            <td colspan="6" class="text-center py-4">در حال دریافت اطلاعات...</td>
+                            <td colspan="7" class="text-center py-4">در حال دریافت اطلاعات...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -148,6 +220,7 @@
                         <tr>
                             <th scope="col">دانشجو</th>
                             <th scope="col">کد</th>
+                            <th scope="col">وضعیت</th>
                             <th scope="col">کل رزرو</th>
                             <th scope="col">فعال</th>
                             <th scope="col">لغوشده</th>
@@ -157,7 +230,7 @@
                     </thead>
                     <tbody id="student-report-body">
                         <tr>
-                            <td colspan="7" class="text-center py-4">در حال دریافت اطلاعات...</td>
+                            <td colspan="8" class="text-center py-4">در حال دریافت اطلاعات...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -191,7 +264,11 @@
                         <tr>
                             <th scope="col">غذا</th>
                             <th scope="col">کد</th>
+                            <th scope="col">دفعات ارائه</th>
                             <th scope="col">کل رزرو</th>
+                            <th scope="col">میانگین</th>
+                            <th scope="col">بیشترین</th>
+                            <th scope="col">کمترین</th>
                             <th scope="col">لغوشده</th>
                             <th scope="col">استفاده‌شده</th>
                             <th scope="col">عدم مراجعه</th>
@@ -201,10 +278,41 @@
                     </thead>
                     <tbody id="meal-report-body">
                         <tr>
-                            <td colspan="8" class="text-center py-4">در حال دریافت اطلاعات...</td>
+                            <td colspan="12" class="text-center py-4">در حال دریافت اطلاعات...</td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </article>
+
+        <article class="panel-card panel-card--stretch">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-heading__title">گزارش رزروها</h2>
+                    <p class="section-heading__subtitle">وضعیت‌های واقعی رزرو در Backend بر اساس بازه انتخابی.</p>
+                </div>
+            </div>
+            <div class="reservation-stat-grid">
+                <div class="reservation-stat-card">
+                    <span class="reservation-stat-card__label">کل رزروها</span>
+                    <strong data-reservation-summary="total_reservations">-</strong>
+                </div>
+                <div class="reservation-stat-card">
+                    <span class="reservation-stat-card__label">فعال</span>
+                    <strong data-reservation-summary="reserved_count">-</strong>
+                </div>
+                <div class="reservation-stat-card">
+                    <span class="reservation-stat-card__label">لغوشده</span>
+                    <strong data-reservation-summary="cancelled_count">-</strong>
+                </div>
+                <div class="reservation-stat-card">
+                    <span class="reservation-stat-card__label">مصرف‌شده</span>
+                    <strong data-reservation-summary="used_count">-</strong>
+                </div>
+                <div class="reservation-stat-card">
+                    <span class="reservation-stat-card__label">عدم مراجعه</span>
+                    <strong data-reservation-summary="no_show_count">-</strong>
+                </div>
             </div>
         </article>
     </section>

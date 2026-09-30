@@ -1,6 +1,7 @@
 from django.urls import path
 
 from common.views import (
+    AdminActivityView,
     AdminHomeView,
     AdminMealsView,
     AdminReportsView,
@@ -31,6 +32,7 @@ urlpatterns = [
     path("admin/reservations/", AdminReservationsView.as_view(), name="web-admin-reservations"),
     path("admin/students/", AdminStudentsView.as_view(), name="web-admin-students"),
     path("admin/reports/", AdminReportsView.as_view(), name="web-admin-reports"),
+    path("admin/activity/", AdminActivityView.as_view(), name="web-admin-activity"),
     path("admin/settings/", AdminSettingsPlaceholderView.as_view(), name="web-admin-settings"),
     path("web/login/", StudentLoginPageView.as_view()),
     path("web/student/", StudentHomePlaceholderView.as_view()),
@@ -43,5 +45,6 @@ urlpatterns = [
     path("web/admin/reservations/", AdminReservationsView.as_view()),
     path("web/admin/students/", AdminStudentsView.as_view()),
     path("web/admin/reports/", AdminReportsView.as_view()),
+    path("web/admin/activity/", AdminActivityView.as_view()),
     path("web/admin/settings/", AdminSettingsPlaceholderView.as_view()),
 ]

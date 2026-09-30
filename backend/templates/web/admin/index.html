@@ -7,7 +7,6 @@
 <div
     id="admin-dashboard-page"
     data-dashboard-url="{% url 'dashboard:admin-dashboard' %}"
-    data-reservations-url="{% url 'reservations:reservation-admin-list' %}"
     data-by-date-url="{% url 'reservations:reservation-by-date' %}"
 >
     <div id="admin-dashboard-feedback" class="d-none mb-4" aria-live="polite"></div>
@@ -31,19 +30,35 @@
         </article>
         <article class="stat-card">
             <div class="stat-card__header">
-                <span class="stat-card__label"><i class="fa-solid fa-bowl-food me-2"></i>غذاهای امروز</span>
-                <span class="status-badge status-badge--warning">برنامه امروز</span>
-            </div>
-            <strong class="stat-card__value" data-summary="today_meals">در حال بارگذاری...</strong>
-            <p class="stat-card__note">تعداد غذاهای برنامه‌ریزی‌شده برای امروز.</p>
-        </article>
-        <article class="stat-card">
-            <div class="stat-card__header">
                 <span class="stat-card__label"><i class="fa-solid fa-calendar-plus me-2"></i>رزروهای آینده</span>
                 <span class="status-badge status-badge--info">پیش‌رو</span>
             </div>
             <strong class="stat-card__value" data-summary="upcoming_reservations">در حال بارگذاری...</strong>
             <p class="stat-card__note">رزروهای فعال برای تاریخ‌های آینده.</p>
+        </article>
+        <article class="stat-card">
+            <div class="stat-card__header">
+                <span class="stat-card__label"><i class="fa-solid fa-bowl-food me-2"></i>غذاهای فعال</span>
+                <span class="status-badge status-badge--warning">فعال</span>
+            </div>
+            <strong class="stat-card__value" data-summary="active_meals">در حال بارگذاری...</strong>
+            <p class="stat-card__note">تعداد غذاهای فعال قابل استفاده در سامانه.</p>
+        </article>
+        <article class="stat-card">
+            <div class="stat-card__header">
+                <span class="stat-card__label"><i class="fa-solid fa-chart-pie me-2"></i>ظرفیت استفاده‌شده امروز</span>
+                <span class="status-badge status-badge--success">Capacity</span>
+            </div>
+            <strong class="stat-card__value" data-summary="today_capacity_used">در حال بارگذاری...</strong>
+            <p class="stat-card__note">مجموع ظرفیت مصرف‌شده امروز بر اساس رزروهای واقعی.</p>
+        </article>
+        <article class="stat-card">
+            <div class="stat-card__header">
+                <span class="stat-card__label"><i class="fa-solid fa-hourglass-half me-2"></i>ظرفیت باقی‌مانده امروز</span>
+                <span class="status-badge status-badge--primary">Remaining</span>
+            </div>
+            <strong class="stat-card__value" data-summary="today_capacity_remaining">در حال بارگذاری...</strong>
+            <p class="stat-card__note">ظرفیت باقی‌مانده برنامه‌های غذایی امروز.</p>
         </article>
     </section>
 
@@ -70,12 +85,14 @@
         </form>
     </section>
 
+    <section id="dashboard-alerts" class="admin-state-stack mb-4" aria-label="هشدارهای مدیریتی"></section>
+
     <section class="admin-dashboard-layout">
         <article class="panel-card panel-card--stretch">
             <div class="section-heading">
                 <div>
-                    <h2 class="section-heading__title">خلاصه غذاهای امروز</h2>
-                    <p class="section-heading__subtitle">ظرفیت، تعداد رزرو و وضعیت هر غذای امروز.</p>
+                    <h2 class="section-heading__title">وضعیت امروز</h2>
+                    <p class="section-heading__subtitle">ظرفیت، تعداد رزرو، ظرفیت باقی‌مانده و درصد استفاده هر غذای امروز.</p>
                 </div>
             </div>
             <div class="table-responsive admin-table-shell">
@@ -84,15 +101,16 @@
                         <tr>
                             <th scope="col">غذا</th>
                             <th scope="col">تاریخ</th>
-                            <th scope="col">رزرو</th>
                             <th scope="col">ظرفیت</th>
+                            <th scope="col">رزرو</th>
                             <th scope="col">باقی‌مانده</th>
+                            <th scope="col">درصد استفاده</th>
                             <th scope="col">وضعیت</th>
                         </tr>
                     </thead>
                     <tbody id="dashboard-today-meals-body">
                         <tr>
-                            <td colspan="6" class="text-center py-4">در حال دریافت اطلاعات...</td>
+                            <td colspan="7" class="text-center py-4">در حال دریافت اطلاعات...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -160,6 +178,7 @@
             </div>
             <div class="chart-card__canvas">
                 <canvas id="reservation-status-chart" aria-label="نمودار وضعیت رزروها"></canvas>
+                <div id="reservation-status-empty" class="chart-empty-state d-none">داده‌ای برای نمایش وجود ندارد.</div>
             </div>
         </article>
     </section>

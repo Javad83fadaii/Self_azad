@@ -121,8 +121,14 @@ def get_dashboard_data(*, start_date=None, end_date=None) -> dict:
         .order_by("meal__name")
     )
     today_meals = []
+    today_capacity_total = 0
+    today_capacity_used = 0
     for schedule in today_schedules:
         remaining_capacity = max(schedule.capacity - schedule.reservation_count, 0)
+        utilization_percentage = _calculate_utilization(
+            reserved_count=schedule.reservation_count,
+            capacity=schedule.capacity,
+        )
         if not schedule.is_active or not schedule.meal.is_active:
             reservation_state = "INACTIVE"
         elif now < schedule.reservation_open_at:
@@ -134,6 +140,8 @@ def get_dashboard_data(*, start_date=None, end_date=None) -> dict:
         else:
             reservation_state = "AVAILABLE"
 
+        today_capacity_total += schedule.capacity
+        today_capacity_used += schedule.reservation_count
         today_meals.append(
             {
                 "schedule_id": schedule.id,
@@ -143,6 +151,7 @@ def get_dashboard_data(*, start_date=None, end_date=None) -> dict:
                 "capacity": schedule.capacity,
                 "reservation_count": schedule.reservation_count,
                 "remaining_capacity": remaining_capacity,
+                "utilization_percentage": utilization_percentage,
                 "reservation_state": reservation_state,
                 "is_active": schedule.is_active and schedule.meal.is_active,
             }
@@ -154,12 +163,72 @@ def get_dashboard_data(*, start_date=None, end_date=None) -> dict:
             meal_schedule__date=today,
             status__in=OCCUPIED_STATUSES,
         ).count(),
-        "today_meals": len(today_meals),
         "upcoming_reservations": Reservation.objects.filter(
             meal_schedule__date__gt=today,
             status=ReservationStatus.RESERVED,
         ).count(),
+        "active_meals": MealSchedule.objects.filter(meal__is_active=True).values("meal_id").distinct().count(),
+        "today_capacity_used": today_capacity_used,
+        "today_capacity_remaining": max(today_capacity_total - today_capacity_used, 0),
     }
+
+    status_distribution = [
+        {
+            "status": ReservationStatus.RESERVED,
+            "count": Reservation.objects.filter(
+                meal_schedule__date__range=(start_date, end_date),
+                status=ReservationStatus.RESERVED,
+            ).count(),
+        },
+        {
+            "status": ReservationStatus.CANCELLED,
+            "count": Reservation.objects.filter(
+                meal_schedule__date__range=(start_date, end_date),
+                status=ReservationStatus.CANCELLED,
+            ).count(),
+        },
+        {
+            "status": ReservationStatus.USED,
+            "count": Reservation.objects.filter(
+                meal_schedule__date__range=(start_date, end_date),
+                status=ReservationStatus.USED,
+            ).count(),
+        },
+        {
+            "status": ReservationStatus.NO_SHOW,
+            "count": Reservation.objects.filter(
+                meal_schedule__date__range=(start_date, end_date),
+                status=ReservationStatus.NO_SHOW,
+            ).count(),
+        },
+    ]
+
+    alerts = []
+    if not today_meals:
+        alerts.append(
+            {
+                "tone": "warning",
+                "title": "برنامه امروز ثبت نشده است",
+                "message": "برای امروز هیچ برنامه غذایی فعالی در سامانه وجود ندارد.",
+            }
+        )
+    full_meals = [item["meal_name"] for item in today_meals if item["reservation_state"] == "FULL"]
+    if full_meals:
+        alerts.append(
+            {
+                "tone": "danger",
+                "title": "تکمیل ظرفیت",
+                "message": f"{len(full_meals)} غذا برای امروز تکمیل ظرفیت شده است.",
+            }
+        )
+    if today_meals and summary["today_reservations"] == 0:
+        alerts.append(
+            {
+                "tone": "info",
+                "title": "رزروی برای امروز ثبت نشده است",
+                "message": "برای برنامه امروز هنوز رزرو فعالی ثبت نشده است.",
+            }
+        )
 
     return {
         "current_date": today,
@@ -167,11 +236,19 @@ def get_dashboard_data(*, start_date=None, end_date=None) -> dict:
         "end_date": end_date,
         "summary": summary,
         "today_meals": today_meals,
+        "alerts": alerts,
         "charts": {
             "reservations_by_day": reservations_by_day,
             "popular_meals": popular_meals,
             "capacity_vs_reservations": capacity_vs_reservations,
             "daily_reservations": daily_reservations,
             "cancelled_reservations": cancelled_reservations,
+            "status_distribution": status_distribution,
         },
     }
+
+
+def _calculate_utilization(*, reserved_count: int, capacity: int) -> float:
+    if capacity <= 0:
+        return 0.0
+    return round((reserved_count / capacity) * 100, 2)

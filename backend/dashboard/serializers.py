@@ -47,8 +47,10 @@ class CancelledReservationPointSerializer(serializers.Serializer):
 class DashboardSummarySerializer(serializers.Serializer):
     total_students = serializers.IntegerField()
     today_reservations = serializers.IntegerField()
-    today_meals = serializers.IntegerField()
     upcoming_reservations = serializers.IntegerField()
+    active_meals = serializers.IntegerField()
+    today_capacity_used = serializers.IntegerField()
+    today_capacity_remaining = serializers.IntegerField()
 
 
 class TodayMealSummarySerializer(serializers.Serializer):
@@ -59,8 +61,14 @@ class TodayMealSummarySerializer(serializers.Serializer):
     capacity = serializers.IntegerField()
     reservation_count = serializers.IntegerField()
     remaining_capacity = serializers.IntegerField()
+    utilization_percentage = serializers.FloatField()
     reservation_state = serializers.CharField()
     is_active = serializers.BooleanField()
+
+
+class StatusDistributionSerializer(serializers.Serializer):
+    status = serializers.CharField()
+    count = serializers.IntegerField()
 
 
 class DashboardChartsSerializer(serializers.Serializer):
@@ -69,6 +77,13 @@ class DashboardChartsSerializer(serializers.Serializer):
     capacity_vs_reservations = CapacityVsReservationPointSerializer(many=True)
     daily_reservations = DailyReservationPointSerializer(many=True)
     cancelled_reservations = CancelledReservationPointSerializer(many=True)
+    status_distribution = StatusDistributionSerializer(many=True)
+
+
+class DashboardAlertSerializer(serializers.Serializer):
+    tone = serializers.CharField()
+    title = serializers.CharField()
+    message = serializers.CharField()
 
 
 class DashboardResponseSerializer(serializers.Serializer):
@@ -77,4 +92,5 @@ class DashboardResponseSerializer(serializers.Serializer):
     end_date = serializers.DateField()
     summary = DashboardSummarySerializer()
     today_meals = TodayMealSummarySerializer(many=True)
+    alerts = DashboardAlertSerializer(many=True)
     charts = DashboardChartsSerializer()

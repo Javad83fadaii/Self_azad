@@ -1,6 +1,7 @@
 import { extractErrorMessage, get } from "../core/http.js";
 import {
     badgeToneForReservationStatus,
+    createAlert,
     clearFeedback,
     createStatusBadge,
     emptyRow,
@@ -15,6 +16,33 @@ import {
 } from "./components/ui.js";
 
 const PAGE_SIZE = 6;
+
+function updateDashboardQuery(params = {}) {
+    const url = new URL(window.location.href);
+    ["start_date", "end_date"].forEach((key) => url.searchParams.delete(key));
+    Object.entries(params).forEach(([key, value]) => {
+        if (value) {
+            url.searchParams.set(key, value);
+        }
+    });
+    window.history.replaceState({}, "", url);
+}
+
+function buildUtilizationBar(item) {
+    const percentage = Math.max(0, Math.min(Number(item.utilization_percentage || 0), 100));
+    const tone = percentage >= 100 ? "danger" : percentage >= 75 ? "warning" : "success";
+    return `
+        <div class="capacity-progress">
+            <div class="capacity-progress__meta">
+                <span>${formatNumber(item.reservation_count)} / ${formatNumber(item.capacity)}</span>
+                <strong>${formatNumber(percentage)}%</strong>
+            </div>
+            <div class="progress" role="progressbar" aria-label="درصد استفاده از ظرفیت" aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar bg-${tone}" style="width: ${percentage}%"></div>
+            </div>
+        </div>
+    `;
+}
 
 function updateSummary(summary) {
     Object.entries(summary || {}).forEach(([key, value]) => {
@@ -32,7 +60,7 @@ function renderTodayMeals(rows) {
     }
 
     if (!rows.length) {
-        tableBody.innerHTML = emptyRow(6, "برای امروز برنامه غذایی فعالی ثبت نشده است.");
+        tableBody.innerHTML = emptyRow(7, "برای امروز برنامه غذایی فعالی ثبت نشده است.");
         return;
     }
 
@@ -42,9 +70,10 @@ function renderTodayMeals(rows) {
                 <tr>
                     <td>${item.meal_name}</td>
                     <td>${formatDate(item.date)}</td>
-                    <td>${formatNumber(item.reservation_count)}</td>
                     <td>${formatNumber(item.capacity)}</td>
+                    <td>${formatNumber(item.reservation_count)}</td>
                     <td>${formatNumber(item.remaining_capacity)}</td>
+                    <td>${buildUtilizationBar(item)}</td>
                     <td>${createStatusBadge(humanizeReservationState(item.reservation_state), badgeToneForReservationStatus(item.reservation_state))}</td>
                 </tr>
             `
@@ -85,17 +114,50 @@ function renderReservations(rows, page, totalItems = rows.length) {
     );
 }
 
-function upsertChart(cache, key, canvasId, config) {
+function upsertChart(cache, key, canvasId, config, hasData = true) {
     const canvas = document.getElementById(canvasId);
     if (!canvas || !window.Chart) {
         return;
+    }
+
+    const wrapper = canvas.parentElement;
+    let emptyState = wrapper?.querySelector(".chart-empty-state");
+    if (!emptyState && wrapper) {
+        emptyState = document.createElement("div");
+        emptyState.className = "chart-empty-state d-none";
+        emptyState.textContent = "داده‌ای برای نمایش وجود ندارد.";
+        wrapper.appendChild(emptyState);
     }
 
     if (cache[key]) {
         cache[key].destroy();
     }
 
+    if (!hasData) {
+        canvas.classList.add("d-none");
+        emptyState?.classList.remove("d-none");
+        return;
+    }
+
+    canvas.classList.remove("d-none");
+    emptyState?.classList.add("d-none");
     cache[key] = new window.Chart(canvas, config);
+}
+
+function renderAlerts(alerts) {
+    const container = document.getElementById("dashboard-alerts");
+    if (!container) {
+        return;
+    }
+
+    if (!alerts?.length) {
+        container.innerHTML = "";
+        return;
+    }
+
+    container.innerHTML = alerts
+        .map((item) => createAlert(item.tone || "info", item.title, item.message))
+        .join("");
 }
 
 function renderCharts(cache, charts) {
@@ -113,7 +175,7 @@ function renderCharts(cache, charts) {
             ],
         },
         options: { responsive: true, maintainAspectRatio: false },
-    });
+    }, charts.popular_meals.length > 0);
 
     upsertChart(cache, "dailyReservations", "daily-reservations-chart", {
         type: "line",
@@ -131,23 +193,21 @@ function renderCharts(cache, charts) {
             ],
         },
         options: { responsive: true, maintainAspectRatio: false },
-    });
+    }, charts.daily_reservations.length > 0);
 
-    const totalReservations = charts.daily_reservations.reduce((sum, item) => sum + item.reservation_count, 0);
-    const totalCancelled = charts.cancelled_reservations.reduce((sum, item) => sum + item.cancelled_count, 0);
     upsertChart(cache, "reservationStatus", "reservation-status-chart", {
         type: "doughnut",
         data: {
-            labels: ["رزرو شده", "لغوشده"],
+            labels: charts.status_distribution.map((item) => humanizeReservationStatus(item.status)),
             datasets: [
                 {
-                    data: [totalReservations, totalCancelled],
-                    backgroundColor: ["#1f7a52", "#b63c3c"],
+                    data: charts.status_distribution.map((item) => item.count),
+                    backgroundColor: ["#1f4b99", "#b63c3c", "#1f7a52", "#b7791f"],
                 },
             ],
         },
         options: { responsive: true, maintainAspectRatio: false },
-    });
+    }, charts.status_distribution.some((item) => Number(item.count) > 0));
 }
 
 export function init() {
@@ -165,6 +225,10 @@ export function init() {
     const reservationsPagination = document.getElementById("dashboard-reservations-pagination");
     let reservationRows = [];
     let reservationPage = 1;
+    const currentUrl = new URL(window.location.href);
+
+    startInput.value = currentUrl.searchParams.get("start_date") || "";
+    endInput.value = currentUrl.searchParams.get("end_date") || "";
 
     function renderReservationPage() {
         renderReservations(
@@ -176,7 +240,7 @@ export function init() {
 
     async function loadDashboard(params = {}) {
         clearFeedback(feedback);
-        document.getElementById("dashboard-today-meals-body").innerHTML = loadingRow(6);
+        document.getElementById("dashboard-today-meals-body").innerHTML = loadingRow(7);
         document.getElementById("dashboard-reservations-body").innerHTML = loadingRow(5);
 
         try {
@@ -187,6 +251,7 @@ export function init() {
 
             updateSummary(dashboardData.summary);
             renderTodayMeals(dashboardData.today_meals || []);
+            renderAlerts(dashboardData.alerts || []);
             reservationRows = reservationsData || [];
             reservationPage = 1;
             renderReservationPage();
@@ -198,9 +263,14 @@ export function init() {
             if (dashboardData.end_date) {
                 endInput.value = dashboardData.end_date;
             }
+            updateDashboardQuery({
+                start_date: startInput.value,
+                end_date: endInput.value,
+            });
         } catch (error) {
             window.console.error("Failed to load admin dashboard.", error);
             setFeedback(feedback, "danger", "خطا در دریافت اطلاعات", extractErrorMessage(error) || "دریافت اطلاعات داشبورد با مشکل مواجه شد.");
+            renderAlerts([]);
         }
     }
 
@@ -228,5 +298,8 @@ export function init() {
         renderReservationPage();
     });
 
-    loadDashboard();
+    loadDashboard({
+        start_date: startInput.value,
+        end_date: endInput.value,
+    });
 }

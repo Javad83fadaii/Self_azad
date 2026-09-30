@@ -16,6 +16,7 @@ urlpatterns = [
     path("api/", include("reservations.urls")),
     path("api/", include("dashboard.urls")),
     path("api/", include("reports.urls")),
+    path("api/", include("audit_logs.urls")),
 ]
 
 if settings.DEBUG:
