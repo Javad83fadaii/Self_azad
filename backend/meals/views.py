@@ -3,6 +3,7 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from audit_logs.services import log_action
 from common.permissions import IsAdminRole, IsStudentRole
 from meals.models import Meal, MealSchedule
 from meals.serializers import MealScheduleSerializer, MealSerializer
@@ -35,6 +36,11 @@ class MealListCreateView(APIView):
         serializer = MealSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         meal = create_meal(**serializer.validated_data)
+        log_action(
+            user=request.user,
+            action="ADMIN_MEAL_CREATE",
+            description=f"ایجاد غذا: {meal.name} ({meal.code})",
+        )
         return Response(MealSerializer(meal).data, status=status.HTTP_201_CREATED)
 
 
@@ -69,11 +75,21 @@ class MealDetailView(APIView):
         serializer = MealSerializer(meal, data=request.data)
         serializer.is_valid(raise_exception=True)
         meal = update_meal(meal=meal, **serializer.validated_data)
+        log_action(
+            user=request.user,
+            action="ADMIN_MEAL_UPDATE",
+            description=f"ویرایش غذا: {meal.name} ({meal.code})",
+        )
         return Response(MealSerializer(meal).data)
 
     def delete(self, request, pk, *args, **kwargs):
         meal = get_object_or_404(Meal, pk=pk)
         deactivate_meal(meal=meal)
+        log_action(
+            user=request.user,
+            action="ADMIN_MEAL_DELETE",
+            description=f"غیرفعال‌سازی غذا: {meal.name} ({meal.code})",
+        )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -106,6 +122,11 @@ class ScheduleListCreateView(APIView):
         serializer = MealScheduleSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         schedule = create_schedule(**serializer.validated_data)
+        log_action(
+            user=request.user,
+            action="ADMIN_SCHEDULE_CREATE",
+            description=f"ایجاد برنامه غذایی برای {schedule.meal.name} در تاریخ {schedule.date.isoformat()}",
+        )
         return Response(MealScheduleSerializer(schedule).data, status=status.HTTP_201_CREATED)
 
 
@@ -119,9 +140,19 @@ class ScheduleDetailView(APIView):
         serializer = MealScheduleSerializer(schedule, data=request.data)
         serializer.is_valid(raise_exception=True)
         schedule = update_schedule(schedule=schedule, **serializer.validated_data)
+        log_action(
+            user=request.user,
+            action="ADMIN_SCHEDULE_UPDATE",
+            description=f"ویرایش برنامه غذایی {schedule.id} برای {schedule.meal.name} در تاریخ {schedule.date.isoformat()}",
+        )
         return Response(MealScheduleSerializer(schedule).data)
 
     def delete(self, request, pk, *args, **kwargs):
         schedule = get_object_or_404(MealSchedule, pk=pk)
         deactivate_schedule(schedule=schedule)
+        log_action(
+            user=request.user,
+            action="ADMIN_SCHEDULE_DELETE",
+            description=f"غیرفعال‌سازی برنامه غذایی {schedule.id} برای {schedule.meal.name} در تاریخ {schedule.date.isoformat()}",
+        )
         return Response(status=status.HTTP_204_NO_CONTENT)

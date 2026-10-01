@@ -1,0 +1,21 @@
+{% extends "web/base/base.html" %}
+
+{% block title %}{{ status_code }} | {{ page_title }}{% endblock %}
+{% block body_class %}error-shell{% endblock %}
+
+{% block content %}
+    <section class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5 text-center">
+                        <p class="text-primary fw-semibold mb-3">{{ status_code }}</p>
+                        <h1 class="h3 mb-3">{{ page_title }}</h1>
+                        <p class="text-body-secondary mb-4">{{ page_message }}</p>
+                        <a href="{% url 'common:web-login' %}" class="btn btn-primary">بازگشت به ورود</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

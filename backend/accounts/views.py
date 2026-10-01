@@ -20,7 +20,9 @@ from accounts.serializers import (
     StudentRegistrationSerializer,
     WebLoginResponseSerializer,
 )
+from accounts.models import UserRole
 from accounts.services import build_current_user_payload, login_admin_for_web, login_student_for_web, login_user, register_student
+from audit_logs.services import log_action
 
 
 class StudentRegistrationView(APIView):
@@ -49,6 +51,12 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         token, user = login_user(**serializer.validated_data)
+        if user.role == UserRole.ADMIN:
+            log_action(
+                user=user,
+                action="ADMIN_LOGIN",
+                description="ورود مدیر از طریق API token انجام شد.",
+            )
         response_serializer = LoginResponseSerializer(
             {
                 "token": token,
@@ -113,6 +121,11 @@ class AdminWebLoginView(APIView):
         serializer.is_valid(raise_exception=True)
         user = login_admin_for_web(**serializer.validated_data)
         django_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+        log_action(
+            user=user,
+            action="ADMIN_LOGIN",
+            description="ورود مدیر به پنل وب انجام شد.",
+        )
         response_serializer = WebLoginResponseSerializer(
             {
                 "success": True,
@@ -128,6 +141,13 @@ class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        user = request.user
+        if getattr(user, "role", None) == UserRole.ADMIN:
+            log_action(
+                user=user,
+                action="ADMIN_LOGOUT",
+                description="خروج مدیر از پنل وب انجام شد.",
+            )
         django_logout(request)
         return Response({"success": True}, status=status.HTTP_200_OK)
 

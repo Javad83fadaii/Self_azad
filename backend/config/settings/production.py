@@ -11,6 +11,8 @@ ALLOWED_HOSTS = [
     for host in get_env("ALLOWED_HOSTS").split(",")  # noqa: F405
     if host.strip()
 ]
+if not ALLOWED_HOSTS:
+    raise RuntimeError("ALLOWED_HOSTS must contain at least one host in production.")
 
 DATABASES = {
     "default": build_mysql_database_config(require_values=True)  # noqa: F405

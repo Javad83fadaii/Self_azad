@@ -6,6 +6,11 @@ from django.conf.urls.static import static
 from django.urls import include, path
 from rest_framework.schemas import get_schema_view
 
+handler400 = "common.error_handlers.bad_request"
+handler403 = "common.error_handlers.permission_denied"
+handler404 = "common.error_handlers.page_not_found"
+handler500 = "common.error_handlers.server_error"
+
 urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("", include("common.urls")),

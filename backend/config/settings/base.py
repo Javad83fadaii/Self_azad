@@ -80,6 +80,14 @@ def get_list_env(name: str, default: str = "") -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
 
 
+def get_optional_path_env(name: str) -> Path | None:
+    """Return a normalized optional filesystem path from the environment."""
+    value = os.getenv(name, "").strip()
+    if not value:
+        return None
+    return Path(value).expanduser()
+
+
 def build_mysql_database_config(
     *,
     require_values: bool = False,
@@ -247,6 +255,8 @@ SESSION_COOKIE_SECURE = get_bool_env("SESSION_COOKIE_SECURE", not DEBUG)
 CSRF_COOKIE_SECURE = get_bool_env("CSRF_COOKIE_SECURE", not DEBUG)
 SESSION_COOKIE_SAMESITE = get_env("SESSION_COOKIE_SAMESITE", "Lax")
 CSRF_COOKIE_SAMESITE = get_env("CSRF_COOKIE_SAMESITE", "Lax")
+SESSION_COOKIE_AGE = get_int_env("SESSION_COOKIE_AGE", 1209600)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = get_bool_env("SESSION_EXPIRE_AT_BROWSER_CLOSE", False)
 SECURE_SSL_REDIRECT = get_bool_env("SECURE_SSL_REDIRECT", not DEBUG)
 SECURE_HSTS_SECONDS = get_int_env("SECURE_HSTS_SECONDS", 31536000 if not DEBUG else 0)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = get_bool_env("SECURE_HSTS_INCLUDE_SUBDOMAINS", not DEBUG)
@@ -254,3 +264,104 @@ SECURE_HSTS_PRELOAD = get_bool_env("SECURE_HSTS_PRELOAD", not DEBUG)
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
 X_FRAME_OPTIONS = "DENY"
+CSRF_FAILURE_VIEW = "common.error_handlers.csrf_failure"
+
+if get_bool_env("USE_X_FORWARDED_PROTO", False):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    USE_X_FORWARDED_HOST = get_bool_env("USE_X_FORWARDED_HOST", True)
+
+LOG_LEVEL = get_env("LOG_LEVEL", "INFO").upper()
+DJANGO_LOG_LEVEL = get_env("DJANGO_LOG_LEVEL", "WARNING").upper()
+ENABLE_FILE_LOGGING = get_bool_env("ENABLE_FILE_LOGGING", False)
+LOG_DIR = get_optional_path_env("LOG_DIR")
+if ENABLE_FILE_LOGGING:
+    LOG_DIR = LOG_DIR or (ROOT_DIR / "logs")
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "%(asctime)s %(levelname)s %(name)s %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
+            "level": LOG_LEVEL,
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": DJANGO_LOG_LEVEL,
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.server": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "accounts": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "meals": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "reservations": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "reports": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "audit_logs": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+    },
+}
+
+if ENABLE_FILE_LOGGING and LOG_DIR is not None:
+    LOGGING["handlers"]["application_file"] = {
+        "class": "logging.handlers.RotatingFileHandler",
+        "formatter": "standard",
+        "filename": str(LOG_DIR / "application.log"),
+        "maxBytes": get_int_env("APP_LOG_MAX_BYTES", 10 * 1024 * 1024),
+        "backupCount": get_int_env("APP_LOG_BACKUP_COUNT", 5),
+        "level": LOG_LEVEL,
+        "encoding": "utf-8",
+    }
+    LOGGING["handlers"]["error_file"] = {
+        "class": "logging.handlers.RotatingFileHandler",
+        "formatter": "standard",
+        "filename": str(LOG_DIR / "error.log"),
+        "maxBytes": get_int_env("ERROR_LOG_MAX_BYTES", 10 * 1024 * 1024),
+        "backupCount": get_int_env("ERROR_LOG_BACKUP_COUNT", 10),
+        "level": "WARNING",
+        "encoding": "utf-8",
+    }
+    for logger_name in ("django", "django.request", "accounts", "meals", "reservations", "reports", "audit_logs"):
+        LOGGING["loggers"][logger_name]["handlers"].append("application_file")
+    for logger_name in ("django", "django.request", "django.db.backends"):
+        LOGGING["loggers"][logger_name]["handlers"].append("error_file")
