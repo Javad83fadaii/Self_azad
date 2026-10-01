@@ -41,7 +41,7 @@ class AuditLogListView(APIView):
             {
                 "id": item.id,
                 "username": item.user.username if item.user else None,
-                "full_name": item.user.get_full_name().strip() if item.user else None,
+                "full_name": (item.user.get_full_name().strip() or None) if item.user else None,
                 "action": item.action,
                 "description": item.description,
                 "created_at": item.created_at,

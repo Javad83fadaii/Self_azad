@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -50,3 +51,23 @@ class StudentPermissionApiTests(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
+
+
+class StudentModelValidationTests(TestCase):
+    def test_student_profile_cannot_link_to_admin_user(self) -> None:
+        admin_user = create_admin_account()
+        _, existing_student = create_student_account(student_code="40110002", phone_number="09120000001")
+
+        invalid_student = existing_student.__class__(
+            user=admin_user,
+            student_code="40110003",
+            first_name="Sara",
+            last_name="Karimi",
+            phone_number="09123334444",
+            is_active=True,
+        )
+
+        with self.assertRaises(ValidationError) as exc_info:
+            invalid_student.full_clean()
+
+        self.assertIn("user", exc_info.exception.message_dict)

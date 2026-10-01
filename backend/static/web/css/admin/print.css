@@ -1,0 +1,95 @@
+@page {
+    size: A4 landscape;
+    margin: 12mm;
+}
+
+body.admin-shell-body {
+    background: #fff !important;
+}
+
+.admin-shell {
+    display: block !important;
+    min-height: auto !important;
+}
+
+.admin-shell__sidebar,
+.admin-sidebar-toggle,
+.admin-topbar,
+.offcanvas,
+.admin-filter-actions,
+#reports-reset-filters,
+#reports-print-trigger,
+[data-export-report],
+.toast-container,
+footer,
+.pagination-placeholder {
+    display: none !important;
+}
+
+.admin-main,
+.admin-shell__main {
+    padding: 0 !important;
+    display: block !important;
+}
+
+.admin-toolbar-card {
+    display: none !important;
+}
+
+.report-print-header {
+    display: block !important;
+    margin-bottom: 1rem !important;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #d1d5db;
+}
+
+.panel-card,
+.admin-table-shell {
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.admin-chart-grid,
+.admin-report-grid,
+.admin-stats-grid {
+    display: block !important;
+}
+
+.admin-chart-grid > *,
+.admin-report-grid > *,
+.admin-stats-grid > * {
+    margin-bottom: 1rem !important;
+}
+
+.chart-card__canvas {
+    height: 240px !important;
+}
+
+.chart-empty-state {
+    display: block !important;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.table {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 11px;
+}
+
+.table th,
+.table td {
+    color: #111827 !important;
+    background: #fff !important;
+    vertical-align: middle !important;
+}
+
+.btn,
+.status-badge,
+.progress {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+}

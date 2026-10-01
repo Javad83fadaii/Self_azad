@@ -90,7 +90,8 @@ class DashboardApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["summary"]["total_students"], 2)
         self.assertEqual(response.data["summary"]["today_reservations"], 1)
-        self.assertEqual(response.data["summary"]["today_meals"], 1)
+        self.assertEqual(response.data["summary"]["today_capacity_used"], 1)
+        self.assertEqual(response.data["summary"]["today_capacity_remaining"], 4)
         self.assertEqual(response.data["summary"]["upcoming_reservations"], 1)
 
         today_meals = response.data["today_meals"]

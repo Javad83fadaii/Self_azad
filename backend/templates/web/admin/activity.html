@@ -1,0 +1,81 @@
+{% extends "web/admin/base.html" %}
+
+{% block title %}فعالیت‌ها | سامانه رزرو غذا{% endblock %}
+
+{% block admin_content %}
+<div
+    id="admin-activity-page"
+    data-activity-url="{% url 'audit_logs:admin-activity-list' %}"
+>
+    <div id="admin-activity-feedback" class="d-none mb-4" aria-live="polite"></div>
+
+    <section class="stats-grid admin-stats-grid mb-4" aria-label="خلاصه فعالیت‌ها">
+        <article class="stat-card">
+            <div class="stat-card__header">
+                <span class="stat-card__label"><i class="fa-solid fa-clock-rotate-left me-2"></i>رخدادهای ثبت‌شده</span>
+                <span class="status-badge status-badge--primary">Audit Log</span>
+            </div>
+            <strong class="stat-card__value" id="activity-total-count">-</strong>
+            <p class="stat-card__note">تعداد رخدادهای منطبق با فیلترهای فعلی.</p>
+        </article>
+    </section>
+
+    <section class="admin-toolbar-card mb-4">
+        <form id="activity-filter-form" class="admin-filter-grid admin-filter-grid--wide">
+            <div class="admin-filter-field">
+                <label for="activity-username" class="form-label">کاربر</label>
+                <input id="activity-username" name="username" type="text" class="form-control" placeholder="نام کاربری یا نام کامل">
+            </div>
+            <div class="admin-filter-field">
+                <label for="activity-action" class="form-label">Action</label>
+                <input id="activity-action" name="action" type="text" class="form-control" placeholder="مثلاً ADMIN_REPORT_EXPORT">
+            </div>
+            <div class="admin-filter-field">
+                <label for="activity-start-date" class="form-label">از تاریخ</label>
+                <input id="activity-start-date" name="start_date" type="date" class="form-control">
+            </div>
+            <div class="admin-filter-field">
+                <label for="activity-end-date" class="form-label">تا تاریخ</label>
+                <input id="activity-end-date" name="end_date" type="date" class="form-control">
+            </div>
+            <div class="admin-filter-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-filter"></i>
+                    <span>اعمال فیلتر</span>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="activity-reset-filters">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>بازنشانی</span>
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel-card panel-card--stretch">
+        <div class="section-heading">
+            <div>
+                <h2 class="section-heading__title">فهرست فعالیت‌ها</h2>
+                <p class="section-heading__subtitle">نمایش رخدادهای ثبت‌شده بر اساس کاربر، نوع عملیات و تاریخ.</p>
+            </div>
+        </div>
+        <div class="table-responsive admin-table-shell">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col">کاربر</th>
+                        <th scope="col">Action</th>
+                        <th scope="col">توضیحات</th>
+                        <th scope="col">زمان</th>
+                    </tr>
+                </thead>
+                <tbody id="activity-table-body">
+                    <tr>
+                        <td colspan="4" class="text-center py-4">در حال دریافت اطلاعات...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="activity-pagination" class="mt-3"></div>
+    </section>
+</div>
+{% endblock %}

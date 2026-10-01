@@ -116,6 +116,34 @@ class AuthenticationApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["detail"], "اطلاعات ورود صحیح نیست.")
 
+    def test_student_web_login_requires_student_code_and_phone_number_payload(self) -> None:
+        create_student_account()
+        browser_client = self._create_browser_client()
+        csrf_token = self._issue_csrf_token(browser_client)
+
+        response = browser_client.post(
+            "/api/auth/student/login/",
+            {
+                "username": "40110001",
+                "password": "StrongPass123",
+            },
+            format="json",
+            HTTP_X_CSRFTOKEN=csrf_token,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("student_code", response.data)
+        self.assertIn("phone_number", response.data)
+
+    def test_student_web_login_accepts_normalized_phone_number(self) -> None:
+        create_student_account()
+        browser_client = self._create_browser_client()
+
+        response = self._login_student_for_web(browser_client, phone_number="+98 912 000 0000")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["success"])
+
     def test_student_web_login_rejects_inactive_student(self) -> None:
         _, student = create_student_account()
         student.is_active = False
@@ -134,6 +162,29 @@ class AuthenticationApiTests(TestCase):
         browser_client = self._create_browser_client()
 
         response = self._login_student_for_web(browser_client)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["detail"], "اطلاعات ورود صحیح نیست.")
+
+    def test_student_web_login_rejects_student_profile_linked_to_admin_user(self) -> None:
+        admin_user = create_admin_account(username="javad")
+        from students.models import Student
+
+        Student.objects.create(
+            user=admin_user,
+            student_code="40215441054217",
+            first_name="Test",
+            last_name="Student",
+            phone_number="09104648477",
+            is_active=True,
+        )
+        browser_client = self._create_browser_client()
+
+        response = self._login_student_for_web(
+            browser_client,
+            student_code="40215441054217",
+            phone_number="09104648477",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["detail"], "اطلاعات ورود صحیح نیست.")

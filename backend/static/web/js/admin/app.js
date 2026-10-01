@@ -1,3 +1,4 @@
+import { init as initActivity } from "./activity.js";
 import { init as initDashboard } from "./dashboard.js";
 import { init as initMeals } from "./meals.js";
 import { init as initReports } from "./reports.js";
@@ -6,6 +7,7 @@ import { init as initSchedules } from "./schedules.js";
 import { init as initStudents } from "./students.js";
 
 const initializers = {
+    activity: initActivity,
     dashboard: initDashboard,
     meals: initMeals,
     schedules: initSchedules,

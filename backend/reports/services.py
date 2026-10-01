@@ -181,6 +181,7 @@ def get_meal_report(*, start_date=None, end_date=None):
         schedules = schedules.filter(date__range=(start_date, end_date))
 
     schedules = schedules.annotate(
+        total_reservation_count=Count("reservations"),
         occupied_count=Count(
             "reservations",
             filter=Q(reservations__status__in=OCCUPIED_STATUSES),
@@ -206,9 +207,10 @@ def get_meal_report(*, start_date=None, end_date=None):
     results = []
     for meal in Meal.objects.order_by("name"):
         meal_schedules = per_meal.get(meal.id, [])
+        total_reservation_counts = [item.total_reservation_count for item in meal_schedules]
         occupied_counts = [item.occupied_count for item in meal_schedules]
         total_capacity = sum(item.capacity for item in meal_schedules)
-        total_reservations = sum(occupied_counts)
+        total_reservations = sum(total_reservation_counts)
         results.append(
             {
                 "meal_id": meal.id,
@@ -219,8 +221,8 @@ def get_meal_report(*, start_date=None, end_date=None):
                 "average_reservations": round(total_reservations / len(meal_schedules), 2)
                 if meal_schedules
                 else 0.0,
-                "max_reservations": max(occupied_counts) if occupied_counts else 0,
-                "min_reservations": min(occupied_counts) if occupied_counts else 0,
+                "max_reservations": max(total_reservation_counts) if total_reservation_counts else 0,
+                "min_reservations": min(total_reservation_counts) if total_reservation_counts else 0,
                 "cancelled_count": sum(item.cancelled_count for item in meal_schedules),
                 "used_count": sum(item.used_count for item in meal_schedules),
                 "no_show_count": sum(item.no_show_count for item in meal_schedules),

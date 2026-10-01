@@ -109,6 +109,7 @@ class WebUiShellTests(TestCase):
             "reservations": self.client.get("/admin/reservations/"),
             "students": self.client.get("/admin/students/"),
             "reports": self.client.get("/admin/reports/"),
+            "activity": self.client.get("/admin/activity/"),
             "settings": self.client.get("/admin/settings/"),
         }
 
@@ -120,6 +121,7 @@ class WebUiShellTests(TestCase):
         self.assertContains(responses["reservations"], "مدیریت رزروها")
         self.assertContains(responses["students"], "مدیریت دانشجویان")
         self.assertContains(responses["reports"], "گزارش‌ها")
+        self.assertContains(responses["activity"], "گزارش فعالیت‌ها")
         self.assertContains(responses["settings"], "تنظیمات")
 
     def test_student_cannot_access_admin_dashboard(self) -> None:
@@ -140,6 +142,7 @@ class WebUiShellTests(TestCase):
             "/admin/reservations/",
             "/admin/students/",
             "/admin/reports/",
+            "/admin/activity/",
             "/admin/settings/",
         ):
             response = self.client.get(path)

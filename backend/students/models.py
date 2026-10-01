@@ -1,6 +1,8 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 
+from accounts.models import UserRole
 from common.models import CreatedUpdatedModel
 
 
@@ -30,3 +32,13 @@ class Student(CreatedUpdatedModel):
     @property
     def full_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
+
+    def clean(self) -> None:
+        super().clean()
+
+        if self.user_id and self.user.role != UserRole.STUDENT:
+            raise ValidationError(
+                {
+                    "user": "Only users with the STUDENT role can be linked to a student profile.",
+                }
+            )

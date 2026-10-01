@@ -1,4 +1,7 @@
+from io import BytesIO
+
 from django.test import TestCase
+from openpyxl import load_workbook
 from rest_framework import status
 
 from reservations.models import Reservation, ReservationStatus
@@ -108,6 +111,25 @@ class ReportsApiTests(TestCase):
             response["Content-Type"],
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
+        workbook = load_workbook(filename=BytesIO(response.content))
+        worksheet = workbook.active
+        self.assertEqual(worksheet["A1"].value, "گزارش عملکرد غذاها")
+        self.assertEqual(worksheet["A5"].value, "شناسه غذا")
+        self.assertEqual(worksheet["B6"].value, "Ghormeh Sabzi")
+
+    def test_daily_meal_report_supports_date_range(self) -> None:
+        response = self.admin_client.get(
+            "/api/admin/reports/daily-meals/",
+            {
+                "start_date": self.schedule_one.date.isoformat(),
+                "end_date": self.schedule_three.date.isoformat(),
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 3)
+        self.assertEqual(response.data["start_date"], self.schedule_one.date.isoformat())
+        self.assertEqual(response.data["end_date"], self.schedule_three.date.isoformat())
 
     def test_student_report_supports_pdf_export(self) -> None:
         response = self.admin_client.get("/api/admin/reports/students/?export=pdf")
@@ -118,5 +140,10 @@ class ReportsApiTests(TestCase):
 
     def test_student_cannot_access_admin_reports(self) -> None:
         response = self.student_client.get("/api/admin/reports/meals/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_student_cannot_export_admin_reports(self) -> None:
+        response = self.student_client.get("/api/admin/reports/daily-meals/?export=xlsx")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
