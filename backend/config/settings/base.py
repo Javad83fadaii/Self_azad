@@ -314,7 +314,27 @@ LOGGING = {
             "level": "ERROR",
             "propagate": False,
         },
+        "django.security": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.security.csrf": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
         "accounts": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "common": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "dashboard": {
             "handlers": ["console"],
             "level": LOG_LEVEL,
             "propagate": False,
@@ -330,6 +350,11 @@ LOGGING = {
             "propagate": False,
         },
         "reports": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "students": {
             "handlers": ["console"],
             "level": LOG_LEVEL,
             "propagate": False,
@@ -361,7 +386,18 @@ if ENABLE_FILE_LOGGING and LOG_DIR is not None:
         "level": "WARNING",
         "encoding": "utf-8",
     }
-    for logger_name in ("django", "django.request", "accounts", "meals", "reservations", "reports", "audit_logs"):
+    for logger_name in (
+        "django",
+        "django.request",
+        "accounts",
+        "audit_logs",
+        "common",
+        "dashboard",
+        "meals",
+        "reports",
+        "reservations",
+        "students",
+    ):
         LOGGING["loggers"][logger_name]["handlers"].append("application_file")
-    for logger_name in ("django", "django.request", "django.db.backends"):
+    for logger_name in ("django", "django.db.backends", "django.request", "django.security", "django.security.csrf"):
         LOGGING["loggers"][logger_name]["handlers"].append("error_file")

@@ -131,6 +131,8 @@ class WebUiShellTests(TestCase):
         response = self.client.get("/admin/")
 
         self.assertEqual(response.status_code, 403)
+        self.assertContains(response, "دسترسی غیرمجاز", status_code=403)
+        self.assertContains(response, "شما اجازه دسترسی به این بخش را ندارید.", status_code=403)
 
     def test_student_cannot_access_other_admin_pages(self) -> None:
         student_user, _ = create_student_account()
@@ -155,6 +157,7 @@ class WebUiShellTests(TestCase):
         response = self.client.get("/student/")
 
         self.assertEqual(response.status_code, 403)
+        self.assertContains(response, "دسترسی غیرمجاز", status_code=403)
 
     def test_logout_clears_session_and_student_dashboard_requires_login_again(self) -> None:
         create_student_account()

@@ -247,6 +247,11 @@ python desktop\main.py
 - از `config.settings.test` استفاده کنید.
 - در این تنظیمات redirect اجباری غیرفعال شده است.
 
+## Production Docs
+
+- راهنمای استقرار: `docs/deployment.md`
+- راهنمای backup و restore: `docs/production_backup.md`
+
 ## گزارش نهایی فاز ۸
 
 - تنظیمات `Development` و `Production` از هم تفکیک شدند.

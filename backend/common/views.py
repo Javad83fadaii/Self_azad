@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseForbidden
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
@@ -157,7 +157,7 @@ class RoleProtectedTemplateView(LoginRequiredMixin, TemplateView):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
         if self.expected_role and getattr(request.user, "role", None) != self.expected_role:
-            return HttpResponseForbidden("You do not have permission to access this page.")
+            raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

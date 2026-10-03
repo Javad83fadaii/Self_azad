@@ -17,7 +17,11 @@ if str(BACKEND_ROOT) not in sys.path:
 
 class BackendSettingsTests(unittest.TestCase):
     def tearDown(self) -> None:
-        for module_name in ("config.settings.base", "config.settings.local"):
+        for module_name in (
+            "config.settings.base",
+            "config.settings.local",
+            "config.settings.production",
+        ):
             sys.modules.pop(module_name, None)
 
     def test_local_settings_fall_back_to_sqlite_without_database_env(self) -> None:
@@ -35,6 +39,49 @@ class BackendSettingsTests(unittest.TestCase):
             local_settings = importlib.import_module("config.settings.local")
 
         self.assertEqual(local_settings.DATABASES["default"]["ENGINE"], "django.db.backends.sqlite3")
+
+    def test_production_settings_require_allowed_hosts(self) -> None:
+        env_overrides = {
+            "DJANGO_SETTINGS_MODULE": "config.settings.production",
+            "DEBUG": "False",
+            "SECRET_KEY": "production-secret-key-for-phase7-tests-with-sufficient-entropy-12345",
+            "ALLOWED_HOSTS": "",
+            "DB_NAME": "ufrs",
+            "DB_USER": "ufrs",
+            "DB_PASSWORD": "strong-password",
+            "DB_HOST": "127.0.0.1",
+            "DB_PORT": "3306",
+        }
+
+        with patch.dict(os.environ, env_overrides, clear=False):
+            with self.assertRaises(RuntimeError):
+                importlib.import_module("config.settings.production")
+
+    def test_production_settings_enable_secure_defaults_and_logging(self) -> None:
+        env_overrides = {
+            "DJANGO_SETTINGS_MODULE": "config.settings.production",
+            "DEBUG": "False",
+            "SECRET_KEY": "production-secret-key-for-phase7-tests-with-sufficient-entropy-67890",
+            "ALLOWED_HOSTS": "example.com,www.example.com",
+            "DB_NAME": "ufrs",
+            "DB_USER": "ufrs",
+            "DB_PASSWORD": "strong-password",
+            "DB_HOST": "127.0.0.1",
+            "DB_PORT": "3306",
+        }
+
+        with patch.dict(os.environ, env_overrides, clear=False):
+            production_settings = importlib.import_module("config.settings.production")
+
+        self.assertFalse(production_settings.DEBUG)
+        self.assertTrue(production_settings.SESSION_COOKIE_SECURE)
+        self.assertTrue(production_settings.CSRF_COOKIE_SECURE)
+        self.assertEqual(
+            production_settings.DATABASES["default"]["ENGINE"],
+            "django.db.backends.mysql",
+        )
+        self.assertIn("django.security", production_settings.LOGGING["loggers"])
+        self.assertIn("students", production_settings.LOGGING["loggers"])
 
 
 if __name__ == "__main__":
