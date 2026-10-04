@@ -6,25 +6,80 @@
 <div
     id="admin-students-page"
     data-list-url="{% url 'students:admin-student-list' %}"
+    data-create-url="{% url 'students:admin-student-list' %}"
     data-reservations-url="{% url 'reservations:reservation-admin-list' %}"
+    data-csrf-url="{% url 'accounts:csrf' %}"
 >
     <div id="admin-students-feedback" class="d-none mb-4" aria-live="polite"></div>
 
     <section class="admin-toolbar-card mb-4">
-        <div class="admin-filter-grid admin-filter-grid--wide">
-            <div class="admin-filter-field">
-                <label for="student-search" class="form-label">جستجوی دانشجو</label>
-                <input id="student-search" type="search" class="form-control" placeholder="نام، نام خانوادگی، کد دانشجویی یا موبایل">
+        <div class="admin-toolbar">
+            <div class="admin-filter-grid admin-filter-grid--wide">
+                <div class="admin-filter-field">
+                    <label for="student-search" class="form-label">جستجوی دانشجو</label>
+                    <input id="student-search" type="search" class="form-control" placeholder="نام، نام خانوادگی، کد دانشجویی یا موبایل">
+                </div>
+                <div class="admin-filter-field">
+                    <label for="student-status-filter" class="form-label">وضعیت</label>
+                    <select id="student-status-filter" class="form-select">
+                        <option value="ALL">همه</option>
+                        <option value="ACTIVE">فعال</option>
+                        <option value="INACTIVE">غیرفعال</option>
+                    </select>
+                </div>
             </div>
-            <div class="admin-filter-field">
-                <label for="student-status-filter" class="form-label">وضعیت</label>
-                <select id="student-status-filter" class="form-select">
-                    <option value="ALL">همه</option>
-                    <option value="ACTIVE">فعال</option>
-                    <option value="INACTIVE">غیرفعال</option>
-                </select>
+            <button type="button" class="btn btn-primary" id="open-student-create-modal">
+                <i class="fa-solid fa-plus"></i>
+                <span>افزودن دانشجو</span>
+            </button>
+        </div>
+    </section>
+
+    <section class="panel-card mb-4" id="student-create-section" aria-labelledby="student-create-section-title">
+        <div class="section-heading">
+            <div>
+                <h2 class="section-heading__title" id="student-create-section-title">افزودن دانشجو</h2>
+                <p class="section-heading__subtitle">دانشجوی جدید را مستقیم از همین صفحه ثبت کنید.</p>
             </div>
         </div>
+        <form id="student-form">
+            <div id="student-form-feedback" class="d-none mb-3"></div>
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="student-form-first-name" class="form-label">نام</label>
+                    <input id="student-form-first-name" name="first_name" type="text" class="form-control" required maxlength="100">
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="student-form-last-name" class="form-label">نام خانوادگی</label>
+                    <input id="student-form-last-name" name="last_name" type="text" class="form-control" required maxlength="100">
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="student-form-student-code" class="form-label">کد دانشجویی</label>
+                    <input id="student-form-student-code" name="student_code" type="text" class="form-control" required maxlength="20">
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="student-form-phone-number" class="form-label">شماره موبایل</label>
+                    <input id="student-form-phone-number" name="phone_number" type="text" class="form-control" required maxlength="20">
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="student-form-password" class="form-label">رمز عبور</label>
+                    <input id="student-form-password" name="password" type="password" class="form-control" required minlength="8">
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="form-check form-switch pt-4">
+                        <input id="student-form-is-active" name="is_active" class="form-check-input" type="checkbox" checked>
+                        <label class="form-check-label" for="student-form-is-active">فعال باشد</label>
+                    </div>
+                </div>
+                <div class="col-12 d-flex justify-content-end gap-2 flex-wrap">
+                    <button type="reset" class="btn btn-outline-secondary" id="student-reset-button">پاک کردن</button>
+                    <button type="submit" class="btn btn-primary" id="student-submit-button">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>ذخیره دانشجو</span>
+                    </button>
+                </div>
+            </div>
+        </form>
     </section>
 
     <section class="panel-card panel-card--stretch">
@@ -71,5 +126,6 @@
             </div>
         </div>
     </div>
+
 </div>
 {% endblock %}

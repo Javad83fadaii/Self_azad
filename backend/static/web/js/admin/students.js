@@ -1,4 +1,4 @@
-import { extractErrorMessage, get } from "../core/http.js";
+import { extractErrorMessage, get, post } from "../core/http.js";
 import {
     badgeToneForReservationStatus,
     clearFeedback,
@@ -11,6 +11,7 @@ import {
     loadingRow,
     renderPagination,
     setFeedback,
+    showToast,
     slicePage,
 } from "./components/ui.js";
 
@@ -100,10 +101,39 @@ export function init() {
     const statusFilter = document.getElementById("student-status-filter");
     const detailBody = document.getElementById("student-detail-body");
     const detailModal = new window.bootstrap.Modal(document.getElementById("studentDetailModal"));
+    const createSection = document.getElementById("student-create-section");
+    const form = document.getElementById("student-form");
+    const formFeedback = document.getElementById("student-form-feedback");
+    const submitButton = document.getElementById("student-submit-button");
+    const createButton = document.getElementById("open-student-create-modal");
+    const resetButton = document.getElementById("student-reset-button");
 
     let students = [];
     let reservations = [];
     let pageNumber = 1;
+
+    function createPayload() {
+        return {
+            first_name: form.querySelector("#student-form-first-name").value.trim(),
+            last_name: form.querySelector("#student-form-last-name").value.trim(),
+            student_code: form.querySelector("#student-form-student-code").value.trim(),
+            phone_number: form.querySelector("#student-form-phone-number").value.trim(),
+            password: form.querySelector("#student-form-password").value,
+            is_active: form.querySelector("#student-form-is-active").checked,
+        };
+    }
+
+    function resetForm() {
+        form.reset();
+        form.querySelector("#student-form-is-active").checked = true;
+        clearFeedback(formFeedback);
+    }
+
+    function openCreateSection() {
+        resetForm();
+        createSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+        form.querySelector("#student-form-first-name")?.focus();
+    }
 
     function filteredStudents() {
         const query = searchInput.value.trim().toLowerCase();
@@ -167,6 +197,26 @@ export function init() {
         }
     }
 
+    async function submitForm(event) {
+        event.preventDefault();
+        clearFeedback(formFeedback);
+        submitButton.disabled = true;
+
+        try {
+            await post(page.dataset.createUrl, createPayload(), { csrfUrl: page.dataset.csrfUrl });
+            resetForm();
+            showToast("دانشجو با موفقیت ایجاد شد.", "success");
+            pageNumber = 1;
+            await loadData();
+            createSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+        } catch (error) {
+            window.console.error("Failed to create student.", error);
+            setFeedback(formFeedback, "danger", "خطا در ایجاد دانشجو", extractErrorMessage(error) || "ثبت دانشجو با مشکل مواجه شد.");
+        } finally {
+            submitButton.disabled = false;
+        }
+    }
+
     tableBody.addEventListener("click", (event) => {
         const button = event.target.closest("[data-action='detail']");
         if (!button) {
@@ -201,6 +251,11 @@ export function init() {
         pageNumber = 1;
         renderTable();
     });
+    createButton.addEventListener("click", openCreateSection);
+    resetButton?.addEventListener("click", () => {
+        clearFeedback(formFeedback);
+    });
+    form.addEventListener("submit", submitForm);
 
     loadData();
 }
