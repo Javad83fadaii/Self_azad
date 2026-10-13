@@ -1,2602 +1,1195 @@
-اکنون وارد فاز ۵ پروژه University Food Reservation System شو.
+اکنون وارد Phase 7 پروژه University Food Reservation System شو.
 
-فازهای قبلی با موفقیت انجام شده‌اند.
+هدف این فاز:
 
-━━━━━━━━━━━━━━━━━━━━
-وضعیت فعلی پروژه
-━━━━━━━━━━━━━━━━━━━━
+آماده‌سازی کامل پروژه برای Deployment روی Server و استفاده واقعی.
 
-Architecture:
+⚠️ این فاز نباید Business Logic سامانه را تغییر دهد.
 
-Django 5.2
-+
-Django REST Framework
-+
-MySQL
-+
-Django Templates
-+
-HTML/CSS/JavaScript
-+
-Bootstrap 5 RTL
-+
-Font Awesome
+⚠️ Desktop Application نباید تغییر رفتاری داشته باشد.
 
-Desktop:
+⚠️ Database Schema فقط در صورت ضرورت واقعی تغییر کند.
 
-PySide6
-+
-Token Authentication
-
-Web:
-
-Django Templates
-+
-Session Authentication
-+
-CSRF
-
-Student Web:
-
-پیاده‌سازی شده و Functional است.
-
-Student Flow:
-
-Login
-→
-Dashboard
-→
-Meal Schedule
-→
-Reservation
-→
-My Reservations
-→
-Cancel Reservation
-→
-Profile
-
-Responsive:
-
-Mobile / Tablet / Desktop بررسی و اصلاح شده است.
-
-Backend Tests:
-
-قبلاً 54 تست پاس شده‌اند.
-
-Desktop Tests:
-
-8 تست پاس شده‌اند.
-
-در فازهای بعد ممکن است تعداد تست‌ها افزایش پیدا کرده باشد؛
-قبل از شروع تست‌ها تعداد واقعی را بررسی کن.
-
-━━━━━━━━━━━━━━━━━━━━
-هدف Phase 5
-━━━━━━━━━━━━━━━━━━━━
-
-در این فاز Admin Panel واقعی و Functional پیاده‌سازی شود.
-
-Admin باید بتواند:
-
-1. داشبورد مدیریتی را ببیند.
-2. آمار کلی سامانه را مشاهده کند.
-3. غذاها را مدیریت کند.
-4. برنامه غذایی روزها را مدیریت کند.
-5. رزروهای دانشجویان را مشاهده کند.
-6. رزروها را بر اساس تاریخ و غذا بررسی کند.
-7. دانشجویان را مشاهده کند.
-8. گزارش‌های موجود را مشاهده کند.
-9. نمودارهای مدیریتی داشته باشد.
-10. همه این موارد را با APIهای موجود انجام دهد.
-
-━━━━━━━━━━━━━━━━━━━━
-قانون اصلی Phase 5
-━━━━━━━━━━━━━━━━━━━━
-
-⚠️ قبل از هر تغییر:
-
-کدهای زیر را بررسی کن:
-
-accounts
-students
-meals
-reservations
-dashboard
-reports
-audit_logs
-
-همچنین:
-
-API URLs
-Serializers
-Views
-Services
-Permissions
-Tests
-
-را بررسی کن.
-
-APIهایی که در Backend وجود دارند را دوباره نساز.
-
-اگر API موجود نیاز UI را پوشش می‌دهد:
-
-همان API را مصرف کن.
-
-━━━━━━━━━━━━━━━━━━━━
-APIهای Admin موجود
-━━━━━━━━━━━━━━━━━━━━
-
-APIهای زیر را بررسی و در صورت مناسب بودن Reuse کن:
-
-GET /api/admin/dashboard/
-
-GET /api/admin/reservations/
-
-GET /api/admin/reservations/by-date/
-
-GET /api/admin/reservations/by-meal/
-
-GET /api/admin/reports/daily-meals/
-
-GET /api/admin/reports/students/
-
-GET /api/admin/reports/meals/
-
-GET /api/admin/students/
-
-GET /api/admin/meals/
-
-GET /api/admin/schedules/
-
-همچنین CRUDهای موجود:
-
-GET /api/meals/
-
-POST /api/meals/
-
-PUT /api/meals/{id}/
-
-DELETE /api/meals/{id}/
-
-POST /api/schedules/
-
-PUT /api/schedules/{id}/
-
-DELETE /api/schedules/{id}/
-
-قبل از استفاده، Response و Request واقعی هر API را از کد بررسی کن.
-
-Payload را حدس نزن.
+⚠️ قبل از هر تغییر، وضعیت واقعی پروژه را از روی کد بررسی کن.
 
 ━━━━━━━━━━━━━━━━━━━━
 
-1. Admin Dashboard
+1. Project Audit
    ━━━━━━━━━━━━━━━━━━━━
 
-صفحه:
+ابتدا وضعیت فعلی را بررسی کن:
 
-/admin/
+* Django settings
+* Environment variables
+* MySQL configuration
+* Static files
+* Templates
+* Media files
+* Authentication
+* CSRF
+* CORS
+* Allowed Hosts
+* API permissions
+* Logging
+* Error handling
+* Export system
+* Audit Log
+* Tests
 
-را از Placeholder به Dashboard واقعی تبدیل کن.
-
-اطلاعات واقعی از:
-
-GET /api/admin/dashboard/
-
-دریافت شود.
-
-Dashboard شامل:
-
-Total Students
-
-Today's Reservations
-
-Today's Meals
-
-Upcoming Reservations
-
-باشد.
-
-اگر API اطلاعات بیشتری برمی‌گرداند:
-
-فقط اطلاعات مرتبط را نمایش بده.
+همچنین ساختار فعلی پروژه را بررسی کن و چیزی که از قبل پیاده شده دوباره نساز.
 
 ━━━━━━━━━━━━━━━━━━━━
-2. Dashboard Statistics Cards
+2. Development / Production Settings
 ━━━━━━━━━━━━━━━━━━━━
 
-کارت‌های آماری حرفه‌ای طراحی کن.
+بررسی کن که تنظیمات Development و Production از هم جدا باشند.
+
+ترجیحاً ساختار موجود را حفظ کن.
 
 مثلاً:
 
-دانشجویان فعال
+config/settings/
+base.py
+local.py
+test.py
+production.py
 
-رزروهای امروز
+اگر پروژه ساختار دیگری دارد:
 
-غذاهای امروز
+همان ساختار موجود را حفظ کن.
 
-رزروهای آینده
+تنظیمات Production باید حداقل موارد زیر را کنترل کند:
 
-هر Card:
+DEBUG
 
-Icon
-Title
-Value
-Description
+SECRET_KEY
 
-داشته باشد.
+ALLOWED_HOSTS
 
-اعداد واقعی Backend باشند.
+DATABASE
 
-Mock Data استفاده نکن.
+CSRF_TRUSTED_ORIGINS
 
-━━━━━━━━━━━━━━━━━━━━
-3. Dashboard Date
-━━━━━━━━━━━━━━━━━━━━
+STATIC
 
-اگر Dashboard برای تاریخ خاصی است:
+MEDIA
 
-تاریخ فعلی را از Backend یا منطق موجود بگیر.
+EMAIL
 
-در صورت وجود امکان انتخاب تاریخ:
-
-Date Picker مناسب ایجاد کن.
-
-اما API را بررسی کن و قابلیت‌هایی که Backend پشتیبانی نمی‌کند اختراع نکن.
+LOGGING
 
 ━━━━━━━━━━━━━━━━━━━━
-4. Dashboard Meal Summary
+3. Environment Variables
 ━━━━━━━━━━━━━━━━━━━━
 
-اگر API اطلاعات غذاهای امروز را برمی‌گرداند:
-
-لیستی از غذاهای امروز نمایش بده.
-
-برای هر غذا:
-
-نام غذا
-
-وعده
-
-تعداد رزرو
-
-ظرفیت
-
-ظرفیت باقی‌مانده
-
-وضعیت
-
-نمایش داده شود.
-
-━━━━━━━━━━━━━━━━━━━━
-5. Dashboard Charts
-━━━━━━━━━━━━━━━━━━━━
-
-از:
-
-Chart.js
-
-استفاده کن.
-
-حداقل نمودارهای مفید:
-
-نمودار تعداد رزرو غذاها
-
-نمودار رزروهای روزانه
-
-در صورت وجود Data مناسب:
-
-نمودار وضعیت رزروها
-
-Chartها باید از API واقعی تغذیه شوند.
-
-Mock Chart نساز.
-
-━━━━━━━━━━━━━━━━━━━━
-6. Chart Responsive
-━━━━━━━━━━━━━━━━━━━━
-
-Chartها باید روی:
-
-Desktop
-Tablet
-Mobile
-
-Responsive باشند.
-
-در Mobile:
-
-ارتفاع مناسب داشته باشند.
-
-باعث Horizontal Overflow نشوند.
-
-━━━━━━━━━━━━━━━━━━━━
-7. Admin Meal Management
-━━━━━━━━━━━━━━━━━━━━
-
-صفحه:
-
-/admin/meals/
-
-ایجاد کن.
-
-هدف:
-
-مدیر بتواند غذاها را مشاهده و مدیریت کند.
-
-از APIهای موجود استفاده کن.
-
-━━━━━━━━━━━━━━━━━━━━
-8. Meal List
-━━━━━━━━━━━━━━━━━━━━
-
-جدول غذاها:
-
-نام غذا
-
-وضعیت
-
-تاریخ ایجاد در صورت وجود
-
-اطلاعات موجود در API
-
-Actions
-
-باشد.
-
-اگر Model اطلاعات بیشتری دارد و برای مدیریت مفید است:
-
-بعد از بررسی Model نمایش بده.
-
-━━━━━━━━━━━━━━━━━━━━
-9. Create Meal
-━━━━━━━━━━━━━━━━━━━━
-
-دکمه:
-
-«افزودن غذا»
-
-یک Modal یا Page Form باز کند.
-
-Form دقیقاً بر اساس Serializer فعلی Meal ساخته شود.
-
-هیچ Field را حدس نزن.
-
-Fieldهای واقعی Model/Serializer را بررسی کن.
-
-━━━━━━━━━━━━━━━━━━━━
-10. Edit Meal
-━━━━━━━━━━━━━━━━━━━━
-
-برای هر غذا:
-
-«ویرایش»
-
-وجود داشته باشد.
-
-PUT:
-
-/api/meals/{id}/
-
-استفاده شود.
-
-Form با اطلاعات فعلی Prefill شود.
-
-━━━━━━━━━━━━━━━━━━━━
-11. Delete Meal
-━━━━━━━━━━━━━━━━━━━━
-
-برای غذا:
-
-«حذف»
-
-قرار بده.
-
-قبل از حذف:
-
-Confirmation Modal
-
-نمایش بده.
-
-مثلاً:
-
-«آیا از حذف این غذا مطمئن هستید؟»
-
-از DELETE API موجود استفاده کن.
-
-━━━━━━━━━━━━━━━━━━━━
-12. Meal Active/Inactive
-━━━━━━━━━━━━━━━━━━━━
-
-اگر Model/API وضعیت Active دارد:
-
-امکان مدیریت آن را بر اساس API موجود فراهم کن.
-
-اگر API مستقلی برای Toggle وجود ندارد:
-
-بدون بررسی Serializer و Backend چیزی اختراع نکن.
-
-در صورت نیاز از Update موجود استفاده کن.
-
-━━━━━━━━━━━━━━━━━━━━
-13. Meal Search
-━━━━━━━━━━━━━━━━━━━━
-
-اگر تعداد غذاها زیاد می‌شود:
-
-Search UI اضافه کن.
-
-Search باید یا:
-
-از Query Parameter پشتیبانی Backend استفاده کند
-
-یا روی داده‌های دریافت‌شده انجام شود.
-
-اگر Backend Search ندارد:
-
-در این فاز Search سمت Client قابل قبول است.
-
-━━━━━━━━━━━━━━━━━━━━
-14. Meal Empty State
-━━━━━━━━━━━━━━━━━━━━
-
-اگر غذایی وجود ندارد:
-
-«هنوز غذایی ثبت نشده است.»
-
-و Button:
-
-«افزودن غذا»
-
-نمایش بده.
-
-━━━━━━━━━━━━━━━━━━━━
-15. Admin Schedule Management
-━━━━━━━━━━━━━━━━━━━━
-
-صفحه:
-
-/admin/schedules/
-
-ایجاد کن.
-
-این صفحه برای مدیریت برنامه غذایی است.
-
-مدیر باید بتواند:
-
-تاریخ
-
-غذا
-
-وعده
-
-ظرفیت
-
-بازه رزرو
-
-و وضعیت
-
-را مدیریت کند؛
-
-اما فقط Fieldهایی که واقعاً در Model/Serializer موجود هستند.
-
-━━━━━━━━━━━━━━━━━━━━
-16. Schedule List
-━━━━━━━━━━━━━━━━━━━━
-
-نمایش:
-
-Date
-
-Meal
-
-Meal Type / Serving
-
-Capacity
-
-Reserved
-
-Remaining
-
-Reservation Start
-
-Reservation End
-
-Status
-
-Actions
-
-اگر Fieldی وجود ندارد:
-
-نمایش نده.
-
-━━━━━━━━━━━━━━━━━━━━
-17. Create Schedule
-━━━━━━━━━━━━━━━━━━━━
-
-دکمه:
-
-«افزودن برنامه غذایی»
-
-Form ایجاد کن.
-
-از:
-
-POST /api/schedules/
-
-استفاده کن.
-
-Mealها از API دریافت شوند.
-
-مدیر بتواند غذا را انتخاب کند.
-
-━━━━━━━━━━━━━━━━━━━━
-18. Edit Schedule
-━━━━━━━━━━━━━━━━━━━━
-
-از:
-
-PUT /api/schedules/{id}/
-
-استفاده کن.
-
-اطلاعات فعلی Prefill شوند.
-
-━━━━━━━━━━━━━━━━━━━━
-19. Delete Schedule
-━━━━━━━━━━━━━━━━━━━━
-
-از:
-
-DELETE /api/schedules/{id}/
-
-استفاده کن.
-
-قبل از حذف Confirmation بگیر.
-
-━━━━━━━━━━━━━━━━━━━━
-20. Schedule Calendar / Weekly View
-━━━━━━━━━━━━━━━━━━━━
-
-یک View مناسب برای برنامه هفتگی ایجاد کن.
-
-ترجیحاً:
-
-شنبه
-یکشنبه
-دوشنبه
-سه‌شنبه
-چهارشنبه
-پنجشنبه
-جمعه
-
-و برنامه هر روز زیر آن.
-
-اما Date واقعی Backend مرجع باشد.
-
-مدیر باید بتواند به سرعت بفهمد:
-
-هر روز چه غذاهایی دارد.
-
-━━━━━━━━━━━━━━━━━━━━
-21. Admin Reservations
-━━━━━━━━━━━━━━━━━━━━
-
-صفحه:
-
-/admin/reservations/
-
-ایجاد کن.
-
-API:
-
-GET /api/admin/reservations/
-
-را مصرف کن.
-
-جدول شامل:
-
-Student
-
-Student Code
-
-Phone
-
-Meal
-
-Date
-
-Serving
-
-Reservation Code
-
-Status
-
-Created At
-
-باشد؛
-
-فقط اگر این اطلاعات واقعاً در Response موجود هستند.
-
-━━━━━━━━━━━━━━━━━━━━
-22. Reservation Filters
-━━━━━━━━━━━━━━━━━━━━
-
-فیلترهای مناسب ایجاد کن.
+اطمینان حاصل کن اطلاعات حساس Hard-code نشده باشند.
 
 حداقل:
 
-تاریخ
+SECRET_KEY
 
-وعده
+DEBUG
 
-غذا
+DB_NAME
 
-وضعیت
+DB_USER
 
-دانشجو
+DB_PASSWORD
 
-اما فقط در صورتی که Backend از آنها پشتیبانی کند.
+DB_HOST
 
-اگر API فیلتر Query Parameter دارد:
+DB_PORT
 
-همان را استفاده کن.
+ALLOWED_HOSTS
 
-اگر ندارد:
+CSRF_TRUSTED_ORIGINS
 
-بر اساس Data دریافت‌شده Filtering Client-side انجام بده.
-
-━━━━━━━━━━━━━━━━━━━━
-23. Reservations By Date
-━━━━━━━━━━━━━━━━━━━━
-
-صفحه/Modal یا View:
-
-«رزروهای یک روز»
-
-با API:
-
-GET /api/admin/reservations/by-date/
-
-پیاده‌سازی کن.
-
-مدیر بتواند یک تاریخ را انتخاب کند.
-
-لیست رزروهای آن روز نمایش داده شود.
-
-━━━━━━━━━━━━━━━━━━━━
-24. Reservations By Meal
-━━━━━━━━━━━━━━━━━━━━
-
-با:
-
-GET /api/admin/reservations/by-meal/
-
-امکان مشاهده رزروهای مربوط به یک غذا فراهم شود.
-
-اگر Endpoint به Parameter خاصی نیاز دارد:
-
-از Serializer/View واقعی استخراج کن.
-
-حدس نزن.
-
-━━━━━━━━━━━━━━━━━━━━
-25. Reservation Detail
-━━━━━━━━━━━━━━━━━━━━
-
-در صورت وجود Endpoint یا اطلاعات کافی:
-
-یک Detail Modal برای رزرو ایجاد کن.
-
-اطلاعات کامل رزرو نمایش داده شود.
-
-در این فاز:
-
-ویرایش رزرو دانشجو را انجام نده.
-
-فقط View.
-
-━━━━━━━━━━━━━━━━━━━━
-26. Admin Students
-━━━━━━━━━━━━━━━━━━━━
-
-صفحه:
-
-/admin/students/
-
-ایجاد کن.
-
-API:
-
-GET /api/admin/students/
-
-استفاده شود.
-
-لیست شامل اطلاعات موجود:
-
-نام
-
-نام خانوادگی
-
-کد دانشجویی
-
-شماره موبایل
-
-وضعیت
-
-تاریخ ثبت
-
-و هر Field مدیریتی مفید موجود باشد.
-
-━━━━━━━━━━━━━━━━━━━━
-27. Student Search
-━━━━━━━━━━━━━━━━━━━━
-
-Search:
-
-نام
-
-نام خانوادگی
-
-کد دانشجویی
-
-شماره موبایل
-
-در صورت امکان.
-
-اگر Backend Search ندارد:
-
-Client-side Search قابل استفاده است.
-
-━━━━━━━━━━━━━━━━━━━━
-28. Student Detail
-━━━━━━━━━━━━━━━━━━━━
-
-در صورت وجود اطلاعات کافی:
-
-Student Detail Modal/Page ایجاد کن.
-
-نمایش:
-
-اطلاعات دانشجو
-
-رزروهای اخیر
-
-در صورت موجود بودن API.
-
-اما API جدید فقط در صورت نیاز واقعی ایجاد شود.
-
-━━━━━━━━━━━━━━━━━━━━
-29. Admin Reports
-━━━━━━━━━━━━━━━━━━━━
-
-صفحه:
-
-/admin/reports/
-
-ایجاد کن.
-
-از APIهای موجود استفاده کن:
-
-/api/admin/reports/daily-meals/
-
-/api/admin/reports/students/
-
-/api/admin/reports/meals/
-
-━━━━━━━━━━━━━━━━━━━━
-30. Daily Meal Report
-━━━━━━━━━━━━━━━━━━━━
-
-گزارش:
-
-تاریخ
-
-غذا
-
-تعداد رزرو
-
-ظرفیت
-
-باقی‌مانده
-
-در صورت وجود اطلاعات.
-
-━━━━━━━━━━━━━━━━━━━━
-31. Student Report
-━━━━━━━━━━━━━━━━━━━━
-
-گزارش مرتبط با دانشجویان را از API واقعی نمایش بده.
-
-Fieldهای واقعی Response را بررسی کن.
-
-━━━━━━━━━━━━━━━━━━━━
-32. Meal Report
-━━━━━━━━━━━━━━━━━━━━
-
-گزارش مربوط به عملکرد غذاها را نمایش بده.
-
-در صورت وجود:
-
-تعداد رزرو
-
-تعداد دفعات استفاده
-
-ظرفیت
-
-و سایر اطلاعات موجود.
-
-━━━━━━━━━━━━━━━━━━━━
-33. Reports Charts
-━━━━━━━━━━━━━━━━━━━━
-
-برای Reports از Chart.js استفاده کن.
-
-حداقل:
-
-Bar Chart برای تعداد رزرو غذاها
-
-Line Chart برای روند رزروها
-
-در صورت وجود Data مناسب:
-
-Doughnut Chart برای وضعیت‌ها
-
-Chartها باید Dynamic باشند.
-
-━━━━━━━━━━━━━━━━━━━━
-34. Date Range
-━━━━━━━━━━━━━━━━━━━━
-
-اگر API Reports از بازه تاریخ پشتیبانی می‌کند:
-
-Date From
-
-Date To
-
-اضافه کن.
-
-اگر پشتیبانی نمی‌کند:
-
-API را تغییر نده مگر اینکه واقعاً لازم باشد.
-
-━━━━━━━━━━━━━━━━━━━━
-35. Admin Navigation
-━━━━━━━━━━━━━━━━━━━━
-
-Sidebar را کامل کن:
-
-داشبورد
-
-غذاها
-
-برنامه غذایی
-
-رزروها
-
-دانشجویان
-
-گزارش‌ها
-
-تنظیمات
-
-فعلاً Settings را فقط Placeholder قرار بده.
-
-━━━━━━━━━━━━━━━━━━━━
-36. Active Navigation
-━━━━━━━━━━━━━━━━━━━━
-
-صفحه فعلی در Sidebar مشخص باشد.
-
-مثلاً:
-
-Dashboard فعال
-
-Meals فعال
-
-Schedules فعال
-
-و غیره.
-
-━━━━━━━━━━━━━━━━━━━━
-37. Admin HTTP Layer
-━━━━━━━━━━━━━━━━━━━━
-
-تمام Requestها باید از:
-
-core/http.js
-
-استفاده کنند.
-
-در Admin JS:
-
-fetch مستقیم ممنوع.
-
-━━━━━━━━━━━━━━━━━━━━
-38. Admin JS Architecture
-━━━━━━━━━━━━━━━━━━━━
-
-ساختار:
-
-static/web/js/admin/
-
-dashboard.js
-meals.js
-schedules.js
-reservations.js
-students.js
-reports.js
+WEB_FRONTEND_URL
 
 در صورت نیاز:
 
-static/web/js/admin/components/
+EMAIL_HOST
 
-ایجاد کن.
+EMAIL_PORT
 
-کدها Modular باشند.
+EMAIL_HOST_USER
 
-از یک فایل عظیم admin.js خودداری کن.
+EMAIL_HOST_PASSWORD
 
-━━━━━━━━━━━━━━━━━━━━
-39. Reusable Admin Components
-━━━━━━━━━━━━━━━━━━━━
+و سایر موارد موجود.
 
-Componentهای قابل استفاده مجدد:
-
-Data Table
-
-Filter Bar
-
-Pagination
-
-Modal
-
-Confirm Modal
-
-Stats Card
-
-Chart Container
-
-Empty State
-
-Loading State
-
-Error State
-
-Toast / Alert
-
-ایجاد یا Reuse کن.
+مقادیر واقعی Secret یا Password را داخل Repository قرار نده.
 
 ━━━━━━━━━━━━━━━━━━━━
-40. Pagination
+4. .env.example
 ━━━━━━━━━━━━━━━━━━━━
 
-اگر API Pagination دارد:
+فایل:
 
-Pagination واقعی پیاده‌سازی کن.
-
-اگر API Pagination ندارد:
-
-Client-side Pagination فقط در صورت نیاز.
-
-Pagination را از خودت به API تحمیل نکن.
-
-━━━━━━━━━━━━━━━━━━━━
-41. Loading State
-━━━━━━━━━━━━━━━━━━━━
-
-برای تمام صفحات Admin:
-
-Initial Loading
-
-Table Loading
-
-Chart Loading
-
-Form Submit Loading
-
-داشته باش.
-
-━━━━━━━━━━━━━━━━━━━━
-42. Error Handling
-━━━━━━━━━━━━━━━━━━━━
-
-تمام API Errorها از HTTP Layer عبور کنند.
-
-پیام مناسب نمایش بده.
-
-مثلاً:
-
-«دریافت اطلاعات با مشکل مواجه شد.»
-
-«ثبت غذا با مشکل مواجه شد.»
-
-«برنامه غذایی ذخیره نشد.»
-
-اما Error واقعی Backend را در Console برای Debug حفظ کن.
-
-اطلاعات حساس را در UI نمایش نده.
-
-━━━━━━━━━━━━━━━━━━━━
-43. Confirmation
-━━━━━━━━━━━━━━━━━━━━
-
-برای عملیات destructive:
-
-Delete Meal
-
-Delete Schedule
-
-از Confirmation Modal استفاده کن.
-
-━━━━━━━━━━━━━━━━━━━━
-44. Security
-━━━━━━━━━━━━━━━━━━━━
-
-Admin Pages فقط برای:
-
-IsAdminRole
-
-قابل دسترسی باشند.
-
-Student:
-
-نباید Admin UI را ببیند.
-
-حتی اگر URL را مستقیم وارد کند، Backend/Server-side access باید جلوگیری کند.
-
-Frontend Role Check فقط UX است.
-
-Permission Backend مرجع اصلی است.
-
-━━━━━━━━━━━━━━━━━━━━
-45. CSRF
-━━━━━━━━━━━━━━━━━━━━
-
-POST
-
-PUT
-
-PATCH
-
-DELETE
-
-باید CSRF مناسب داشته باشند.
-
-از HTTP Layer موجود استفاده کن.
-
-CSRF را Disable نکن.
-
-━━━━━━━━━━━━━━━━━━━━
-46. Desktop Compatibility
-━━━━━━━━━━━━━━━━━━━━
-
-هیچ تغییری نباید:
-
-Token Authentication
-
-Desktop API
-
-Desktop Login
-
-Desktop Reservation
-
-را خراب کند.
-
-Desktop Client نباید تغییر رفتاری داشته باشد.
-
-━━━━━━━━━━━━━━━━━━━━
-47. Database
-━━━━━━━━━━━━━━━━━━━━
-
-در این فاز:
-
-Schema را تغییر نده.
-
-Migration ایجاد نکن مگر اینکه واقعاً لازم باشد.
-
-Business Logic تغییر نکند.
-
-━━━━━━━━━━━━━━━━━━━━
-48. Backend Business Logic
-━━━━━━━━━━━━━━━━━━━━
-
-Admin UI فقط Client است.
-
-قوانین اصلی:
-
-Reservation
-
-Capacity
-
-Schedule
-
-Meal
-
-Permission
-
-همچنان در Backend باقی بمانند.
-
-Business Logic را به JavaScript منتقل نکن.
-
-━━━━━━━━━━━━━━━━━━━━
-49. Responsive Admin
-━━━━━━━━━━━━━━━━━━━━
-
-تمام صفحات Admin را روی:
-
-360px
-
-576px
-
-768px
-
-992px
-
-1200px
-
-بررسی کن.
-
-به ویژه:
-
-Sidebar
-
-Topbar
-
-Tables
-
-Filters
-
-Charts
-
-Forms
-
-Modals
-
-نباید Overflow ایجاد کنند.
-
-━━━━━━━━━━━━━━━━━━━━
-50. Mobile Tables
-━━━━━━━━━━━━━━━━━━━━
-
-جدول‌های Admin روی Mobile باید:
-
-Responsive
-
-Scrollable
-
-باشند.
-
-از:
-
-.table-responsive
-
-استفاده کن.
-
-اطلاعات مهم نباید به دلیل Width مخفی شوند.
-
-━━━━━━━━━━━━━━━━━━━━
-51. Mobile Filters
-━━━━━━━━━━━━━━━━━━━━
-
-Filter Bar در Mobile:
-
-Stack
-
-یا
-
-Accordion/Collapse
-
-شود.
-
-Inputها Width مناسب داشته باشند.
-
-━━━━━━━━━━━━━━━━━━━━
-52. Browser QA
-━━━━━━━━━━━━━━━━━━━━
-
-این فاز حتماً Browser QA واقعی داشته باشد.
-
-صفحات:
-
-/admin/
-
-/admin/meals/
-
-/admin/schedules/
-
-/admin/reservations/
-
-/admin/students/
-
-/admin/reports/
-
-را اجرا کن.
-
-هم Desktop و هم Mobile بررسی شوند.
-
-━━━━━━━━━━━━━━━━━━━━
-53. Real Data Test
-━━━━━━━━━━━━━━━━━━━━
-
-از Mock Data استفاده نکن.
-
-با Database فعلی:
-
-حداقل:
-
-یک Meal
-
-یک Schedule
-
-چند Student
-
-چند Reservation
-
-داشته باش.
-
-اگر داده تست موجود نیست:
-
-داده تست ایجاد کن یا از Fixture/Test DB استفاده کن؛
-
-اما داده واقعی Production را بدون اجازه تغییر نده.
-
-━━━━━━━━━━━━━━━━━━━━
-54. Full Admin Flow
-━━━━━━━━━━━━━━━━━━━━
-
-این Flow را دستی تست کن:
-
-Admin Login
-
-↓
-
-Admin Dashboard
-
-↓
-
-مشاهده آمار
-
-↓
-
-Meals
-
-↓
-
-ایجاد غذا
-
-↓
-
-ویرایش غذا
-
-↓
-
-Schedules
-
-↓
-
-ایجاد Schedule
-
-↓
-
-ویرایش Schedule
-
-↓
-
-Reservations
-
-↓
-
-Filter By Date
-
-↓
-
-مشاهده Reservation
-
-↓
-
-Students
-
-↓
-
-مشاهده Student
-
-↓
-
-Reports
-
-↓
-
-مشاهده Chart
-
-━━━━━━━━━━━━━━━━━━━━
-55. Regression Tests
-━━━━━━━━━━━━━━━━━━━━
-
-بعد از پیاده‌سازی:
-
-تمام Backend Tests
-
-تمام Desktop Tests
-
-را اجرا کن.
-
-تعداد دقیق تست‌ها را گزارش کن.
-
-همچنین تست‌های Admin جدید اضافه کن.
-
-حداقل تست‌ها:
-
-1. Admin Dashboard access
-
-2. Student cannot access Admin Dashboard
-
-3. Admin Meals access
-
-4. Student cannot access Admin Meals
-
-5. Create Meal
-
-6. Update Meal
-
-7. Delete Meal
-
-8. Create Schedule
-
-9. Update Schedule
-
-10. Delete Schedule
-
-11. Admin Reservations
-
-12. Admin Students
-
-13. Admin Reports
-
-14. Admin API permission checks
-
-━━━━━━━━━━━━━━━━━━━━
-56. API Regression
-━━━━━━━━━━━━━━━━━━━━
-
-تمام APIهای Desktop را نیز بررسی کن.
-
-مخصوصاً:
-
-POST /api/auth/login/
-
-و Reservation APIها.
-
-نباید به دلیل تغییر Admin UI خراب شوند.
-
-━━━━━━━━━━━━━━━━━━━━
-57. No Unnecessary Backend Changes
-━━━━━━━━━━━━━━━━━━━━
-
-اگر Backend کاملاً API مورد نیاز UI را دارد:
-
-Backend را تغییر نده.
-
-اگر API Response واقعاً ناقص است:
-
-اول دقیقاً مشخص کن چه چیزی کم است.
-
-سپس حداقل تغییر ممکن را انجام بده.
-
-━━━━━━━━━━━━━━━━━━━━
-58. Code Quality
-━━━━━━━━━━━━━━━━━━━━
-
-کد:
-
-Readable
-
-Modular
-
-Reusable
-
-Maintainable
-
-باشد.
-
-Duplicate JavaScript ایجاد نکن.
-
-Duplicate API Logic ایجاد نکن.
-
-Magic Stringها را تا حد امکان مدیریت کن.
-
-━━━━━━━━━━━━━━━━━━━━
-59. Final Verification
-━━━━━━━━━━━━━━━━━━━━
-
-قبل از پایان:
-
-python manage.py check
-
-را اجرا کن.
-
-سپس:
-
-تمام Backend Tests
-
-تمام Desktop Tests
-
-تمام Web/Admin Tests
-
-را اجرا کن.
-
-اگر پروژه ابزار Lint/Formatter دارد:
-
-از همان ابزار موجود استفاده کن.
-
-ابزار جدید غیرضروری نصب نکن.
-
-━━━━━━━━━━━━━━━━━━━━
-60. Final Report
-━━━━━━━━━━━━━━━━━━━━
-
-در پایان فقط گزارش کامل Phase 5 را بده.
-
-گزارش شامل:
-
-1. Admin Dashboard
-
-2. Meal Management
-
-3. Schedule Management
-
-4. Reservation Management
-
-5. Student Management
-
-6. Reports
-
-7. Charts
-
-8. APIهای مصرف‌شده
-
-9. APIهای جدید در صورت وجود
-
-10. Backend Changes
-
-11. Database Changes
-
-12. Migration Changes
-
-13. Templateهای ایجادشده
-
-14. CSSهای ایجادشده
-
-15. JavaScriptهای ایجادشده
-
-16. Componentهای ایجادشده
-
-17. تست‌های جدید
-
-18. تعداد کل Backend Tests
-
-19. تعداد Desktop Tests
-
-20. Browser QA
-
-21. Mobile QA
-
-22. مشکلات باقی‌مانده
-
-23. پیشنهاد Phase 6
-
-━━━━━━━━━━━━━━━━━━━━
-قانون نهایی Phase 5
-━━━━━━━━━━━━━━━━━━━━
-
-فقط Phase 5 را انجام بده.
-
-وارد امکانات Phase 6 نشو.
-
-در صورت کامل شدن تمام موارد، متوقف شو.
-
-هیچ Business Logic موجود را بدون دلیل تغییر نده.
-
-هیچ API موجود را Duplicate نکن.
-
-هیچ Mock Data را به عنوان اطلاعات واقعی نمایش نده.
-
-Desktop Application باید بدون تغییر رفتاری باقی بماند.
-
-اکنون وارد Phase 6 پروژه University Food Reservation System شو.
-
-فازهای قبلی باید قبل از شروع بررسی شوند و وضعیت واقعی پروژه از روی کد مشخص شود.
-
-━━━━━━━━━━━━━━━━━━━━
-هدف Phase 6
-━━━━━━━━━━━━━━━━━━━━
-
-هدف این فاز تکمیل بخش مدیریتی سامانه از نظر:
-
-* گزارش‌های حرفه‌ای
-* فیلترهای پیشرفته
-* خروجی Excel
-* خروجی CSV در صورت نیاز
-* Print-friendly Reports
-* Dashboard مدیریتی کامل‌تر
-* Audit Log
-* Activity Monitoring
-* بهبود UX پنل Admin
-* آماده‌سازی برای استفاده واقعی
-
-⚠️ قابلیت‌های اصلی Student و Reservation قبلاً پیاده‌سازی شده‌اند.
-
-⚠️ در این فاز Business Logic اصلی رزرو را بازنویسی نکن.
-
-━━━━━━━━━━━━━━━━━━━━
-
-1. ابتدا Audit پروژه
-   ━━━━━━━━━━━━━━━━━━━━
-
-قبل از هر تغییر، وضعیت واقعی پروژه را بررسی کن.
-
-بررسی کن:
-
-* Phase 5 واقعاً چه مواردی را پیاده‌سازی کرده است.
-* APIهای موجود چه Responseهایی دارند.
-* Reports فعلی چه اطلاعاتی دارند.
-* Admin Dashboard فعلی چه اطلاعاتی دارد.
-* AuditLog چه Fieldهایی دارد.
-* آیا Export قبلاً پیاده‌سازی شده یا خیر.
-* تست‌های فعلی چند مورد هستند.
-
-⚠️ چیزی که از قبل وجود دارد دوباره نساز.
-
-━━━━━━━━━━━━━━━━━━━━
-2. Admin Dashboard Enhancement
-━━━━━━━━━━━━━━━━━━━━
-
-صفحه:
-
-/admin/
+.env.example
 
 را بررسی و در صورت نیاز تکمیل کن.
 
-Dashboard باید اطلاعات واقعی و کاربردی مدیریتی نمایش دهد.
+این فایل نباید مقدار واقعی Password یا Secret داشته باشد.
 
-حداقل:
-
-تعداد دانشجویان
-
-تعداد رزروهای امروز
-
-تعداد رزروهای آینده
-
-تعداد غذاهای فعال
-
-ظرفیت استفاده‌شده امروز
-
-ظرفیت باقی‌مانده امروز
+برای هر Variable توضیح کوتاه قرار بده.
 
 ━━━━━━━━━━━━━━━━━━━━
-3. Today's Overview
-━━━━━━━━━━━━━━━━━━━━
-
-یک بخش:
-
-«وضعیت امروز»
-
-ایجاد کن.
-
-برای هر غذای امروز:
-
-نام غذا
-
-وعده
-
-ظرفیت
-
-رزرو شده
-
-باقی‌مانده
-
-درصد استفاده از ظرفیت
-
-نمایش داده شود.
-
-درصد استفاده:
-
-reserved / capacity * 100
-
-باشد.
-
-اما اگر Backend مقدار آماده ارائه می‌دهد:
-
-از مقدار Backend استفاده کن.
-
-━━━━━━━━━━━━━━━━━━━━
-4. Capacity Visualization
-━━━━━━━━━━━━━━━━━━━━
-
-برای هر Meal یک Progress Bar مناسب نمایش بده.
-
-مثلاً:
-
-رزرو شده:
-75 / 100
-
-75%
-
-اگر ظرفیت تکمیل باشد:
-
-وضعیت واضح نمایش داده شود.
-
-⚠️ این فقط UI است.
-
-محاسبه ظرفیت و جلوگیری از Overbooking همچنان Backend است.
-
-━━━━━━━━━━━━━━━━━━━━
-5. Dashboard Alerts
-━━━━━━━━━━━━━━━━━━━━
-
-در صورت وجود اطلاعات لازم، هشدارهای مدیریتی نمایش بده.
-
-مثلاً:
-
-ظرفیت یک غذا تکمیل شده است.
-
-یک غذا ظرفیت بسیار کمی دارد.
-
-برای امروز برنامه غذایی ثبت نشده است.
-
-رزرو امروز هنوز پایین است.
-
-اما:
-
-⚠️ هیچ Threshold جدیدی بدون دلیل ایجاد نکن.
-
-اگر Threshold لازم است:
-
-آن را Configurable یا واضح و مستند کن.
-
-━━━━━━━━━━━━━━━━━━━━
-6. Reports Center
-━━━━━━━━━━━━━━━━━━━━
-
-صفحه:
-
-/admin/reports/
-
-را به مرکز گزارش‌های مدیریتی تبدیل کن.
-
-گزارش‌ها دسته‌بندی شوند:
-
-گزارش غذاها
-
-گزارش رزروها
-
-گزارش دانشجویان
-
-گزارش روزانه
-
-گزارش بازه زمانی
-
-━━━━━━━━━━━━━━━━━━━━
-7. Date Range Filter
-━━━━━━━━━━━━━━━━━━━━
-
-در Reports امکان انتخاب:
-
-از تاریخ
-
-تا تاریخ
-
-ایجاد کن.
-
-اگر API موجود از Date Range پشتیبانی می‌کند:
-
-از همان استفاده کن.
-
-اگر API فعلی فقط یک Date می‌گیرد:
-
-Backend را فقط در صورت نیاز واقعی و با حداقل تغییر توسعه بده.
-
-Business Logic رزرو را تغییر نده.
-
-━━━━━━━━━━━━━━━━━━━━
-8. Daily Meal Report
-━━━━━━━━━━━━━━━━━━━━
-
-گزارش روزانه شامل:
-
-Date
-
-Meal
-
-Serving
-
-Capacity
-
-Reservations
-
-Remaining
-
-Utilization %
-
-باشد؛
-
-البته فقط Fieldهایی که از Backend قابل استخراج هستند.
-
-━━━━━━━━━━━━━━━━━━━━
-9. Meal Performance Report
-━━━━━━━━━━━━━━━━━━━━
-
-گزارشی برای بررسی عملکرد غذاها ایجاد کن.
-
-مثلاً:
-
-نام غذا
-
-تعداد دفعات ارائه
-
-مجموع رزرو
-
-میانگین رزرو
-
-بیشترین رزرو
-
-کمترین رزرو
-
-در صورتی که Data لازم در Backend موجود باشد.
-
-اگر اطلاعاتی در دیتابیس وجود ندارد:
-
-آن Metric را اختراع نکن.
-
-━━━━━━━━━━━━━━━━━━━━
-10. Student Statistics
-━━━━━━━━━━━━━━━━━━━━
-
-گزارش دانشجویان شامل اطلاعات آماری واقعی باشد.
-
-مثلاً:
-
-تعداد دانشجویان فعال
-
-تعداد دانشجویان دارای رزرو
-
-تعداد رزروها
-
-درصد مشارکت
-
-در صورت وجود Data لازم.
-
-━━━━━━━━━━━━━━━━━━━━
-11. Reservation Statistics
-━━━━━━━━━━━━━━━━━━━━
-
-گزارش رزروها:
-
-Total Reservations
-
-Active
-
-Cancelled
-
-Completed
-
-در صورت وجود Statusهای واقعی Backend.
-
-Statusها را از Model بررسی کن.
-
-━━━━━━━━━━━━━━━━━━━━
-12. Charts
-━━━━━━━━━━━━━━━━━━━━
-
-Chart.js را بررسی و در صورت نیاز تکمیل کن.
-
-حداقل:
-
-Bar Chart:
-
-تعداد رزرو هر غذا
-
-Line Chart:
-
-روند رزرو در روزهای انتخاب‌شده
-
-Doughnut Chart:
-
-توزیع وضعیت رزروها
-
-تمام Chartها باید از API واقعی تغذیه شوند.
-
-Mock Data ممنوع.
-
-━━━━━━━━━━━━━━━━━━━━
-13. Chart Empty State
-━━━━━━━━━━━━━━━━━━━━
-
-اگر Data وجود ندارد:
-
-Chart خالی نمایش نده.
-
-به جای آن:
-
-«داده‌ای برای نمایش وجود ندارد.»
-
-نمایش بده.
-
-━━━━━━━━━━━━━━━━━━━━
-14. Export Excel
-━━━━━━━━━━━━━━━━━━━━
-
-قابلیت Export گزارش‌ها به Excel ایجاد کن.
-
-هدف:
-
-مدیر بتواند گزارش فعلی را دانلود کند.
-
-فرمت:
-
-.xlsx
-
-باشد.
-
-قبل از نصب Library جدید:
-
-بررسی کن آیا پروژه Library مناسب دارد.
-
-اگر Backend Export می‌کند:
-
-از همان استفاده کن.
-
-اگر ندارد:
-
-یک روش استاندارد و سبک اضافه کن.
-
-ترجیحاً:
-
-openpyxl
-
-برای تولید Excel.
-
-━━━━━━━━━━━━━━━━━━━━
-15. Excel Structure
-━━━━━━━━━━━━━━━━━━━━
-
-Excel خروجی باید:
-
-عنوان گزارش
-
-تاریخ تولید
-
-بازه گزارش
-
-Header
-
-Data
-
-داشته باشد.
-
-نام Columnها فارسی و خوانا باشند.
-
-مثلاً:
-
-نام غذا
-
-تاریخ
-
-وعده
-
-ظرفیت
-
-تعداد رزرو
-
-ظرفیت باقی‌مانده
-
-━━━━━━━━━━━━━━━━━━━━
-16. CSV Export
-━━━━━━━━━━━━━━━━━━━━
-
-در صورت مفید بودن:
-
-CSV Export نیز ایجاد کن.
-
-Encoding باید برای Excel و فارسی مناسب باشد.
-
-ترجیحاً UTF-8 با BOM در صورت نیاز.
-
-━━━━━━━━━━━━━━━━━━━━
-17. Print Report
-━━━━━━━━━━━━━━━━━━━━
-
-گزارش‌ها باید Print-friendly باشند.
-
-یک CSS:
-
-print.css
-
-ایجاد کن.
-
-در هنگام Print:
-
-Sidebar
-
-Navigation
-
-Buttons
-
-فیلترهای غیرضروری
-
-مخفی شوند.
-
-خود گزارش به شکل مرتب چاپ شود.
-
-━━━━━━━━━━━━━━━━━━━━
-18. Print Header
-━━━━━━━━━━━━━━━━━━━━
-
-نسخه چاپی شامل:
-
-نام دانشگاه
-
-عنوان گزارش
-
-تاریخ تولید
-
-بازه گزارش
-
-باشد.
-
-━━━━━━━━━━━━━━━━━━━━
-19. Audit Log
-━━━━━━━━━━━━━━━━━━━━
-
-Model:
-
-audit_logs.AuditLog
-
-را دقیق بررسی کن.
-
-مشخص کن چه Actionهایی در حال حاضر ثبت می‌شوند.
-
-بدون تغییر غیرضروری Model:
-
-یک صفحه Admin برای مشاهده Audit Log ایجاد کن.
-
-مثلاً:
-
-/admin/activity/
-
-━━━━━━━━━━━━━━━━━━━━
-20. Activity List
-━━━━━━━━━━━━━━━━━━━━
-
-نمایش:
-
-کاربر
-
-Action
-
-زمان
-
-Object
-
-Description
-
-IP در صورت وجود
-
-باشد.
-
-فقط Fieldهای واقعی Model را استفاده کن.
-
-━━━━━━━━━━━━━━━━━━━━
-21. Activity Filters
-━━━━━━━━━━━━━━━━━━━━
-
-در صورت وجود Data:
-
-فیلتر:
-
-کاربر
-
-Action
-
-Date
-
-را اضافه کن.
-
-اگر Backend API مناسب وجود ندارد:
-
-اول بررسی کن آیا می‌توان از QuerySet امن Server-side استفاده کرد.
-
-اطلاعات Audit Log فقط برای Admin قابل مشاهده باشد.
-
-━━━━━━━━━━━━━━━━━━━━
-22. Audit Security
-━━━━━━━━━━━━━━━━━━━━
-
-Audit Log نباید برای Student قابل دسترسی باشد.
-
-همچنین:
-
-Student
-
-نباید بتواند Audit Log را تغییر دهد.
-
-در صورت وجود API:
-
-Permission را بررسی کن.
-
-━━━━━━━━━━━━━━━━━━━━
-23. Admin Search UX
-━━━━━━━━━━━━━━━━━━━━
-
-UX جستجو در Admin را بررسی کن.
-
-صفحات:
-
-Meals
-
-Schedules
-
-Reservations
-
-Students
-
-Reports
-
-باید Search/Filter مناسب داشته باشند.
-
-از ایجاد Request اضافی غیرضروری خودداری کن.
-
-━━━━━━━━━━━━━━━━━━━━
-24. Filter Persistence
-━━━━━━━━━━━━━━━━━━━━
-
-اگر کاربر در صفحه Reports فیلتر انتخاب کرد:
-
-بعد از Refresh در صورت امکان Filterها حفظ شوند.
-
-می‌توان از:
-
-URL Query Parameters
-
-استفاده کرد.
-
-مثلاً:
-
-?from=...
-&to=...
-
-اما Query Parameter باید با Backend سازگار باشد.
-
-━━━━━━━━━━━━━━━━━━━━
-25. Admin Table UX
-━━━━━━━━━━━━━━━━━━━━
-
-جدول‌های Admin را بررسی کن.
-
-ویژگی‌ها:
-
-Sortable در صورت امکان
-
-Responsive
-
-Empty State
-
-Loading
-
-Error
-
-Pagination
-
-Search
-
-Filter
-
-داشته باشند.
-
-⚠️ Sorting سمت Client فقط در صورت مناسب بودن Data.
-
-━━━━━━━━━━━━━━━━━━━━
-26. Bulk Actions
-━━━━━━━━━━━━━━━━━━━━
-
-قبل از ایجاد Bulk Action:
-
-بررسی کن آیا واقعاً برای پروژه لازم است.
-
-در این فاز فقط در صورت وجود Use Case واضح اضافه کن.
-
-مثلاً:
-
-Export انتخاب‌شده‌ها
-
-در غیر این صورت:
-
-Bulk Delete یا Bulk Update اضافه نکن.
-
-━━━━━━━━━━━━━━━━━━━━
-27. Notifications
-━━━━━━━━━━━━━━━━━━━━
-
-سیستم Toast/Alert Admin را یکدست کن.
-
-موارد:
-
-Success
-
-Error
-
-Warning
-
-Info
-
-ساختار مشترک داشته باشند.
-
-مثلاً:
-
-غذا با موفقیت ثبت شد.
-
-گزارش آماده شد.
-
-دریافت اطلاعات با مشکل مواجه شد.
-
-━━━━━━━━━━━━━━━━━━━━
-28. Loading UX
-━━━━━━━━━━━━━━━━━━━━
-
-در عملیات طولانی:
-
-Loading State
-
-نمایش بده.
-
-مثلاً Export:
-
-«در حال آماده‌سازی گزارش...»
-
-Chart:
-
-«در حال دریافت اطلاعات...»
-
-━━━━━━━━━━━━━━━━━━━━
-29. Error Handling
-━━━━━━━━━━━━━━━━━━━━
-
-تمام Errorها از HTTP Layer عبور کنند.
-
-پیام UI استاندارد باشد.
-
-اطلاعات حساس Backend در UI نمایش داده نشود.
-
-Console در Development برای Debug حفظ شود.
-
-━━━━━━━━━━━━━━━━━━━━
-30. Performance
+5. Production Secret
 ━━━━━━━━━━━━━━━━━━━━
 
 بررسی کن:
 
-آیا Dashboard درخواست API بیش از حد می‌فرستد؟
+SECRET_KEY
 
-آیا یک API چند بار بدون نیاز Call می‌شود؟
+در Production از Environment Variable خوانده شود.
 
-آیا Chartها دوباره و غیرضروری Render می‌شوند؟
+اگر Secret در Source Code قرار دارد:
 
-آیا Table Refresh باعث Requestهای تکراری می‌شود؟
+اصلاح کن.
 
-Requestهای غیرضروری حذف شوند.
-
-━━━━━━━━━━━━━━━━━━━━
-31. Caching
-━━━━━━━━━━━━━━━━━━━━
-
-در صورت نیاز واقعی:
-
-داده‌های کاملاً Read-only و کوتاه‌مدت می‌توانند Cache شوند.
-
-اما:
-
-Reservation
-
-Capacity
-
-و اطلاعات حساس عملیاتی
-
-نباید بدون بررسی Cache شوند.
+اما Secret فعلی را در Git History دستکاری نکن مگر اینکه کاربر صراحتاً درخواست کرده باشد.
 
 ━━━━━━━━━━━━━━━━━━━━
-32. Admin Mobile
+6. DEBUG
 ━━━━━━━━━━━━━━━━━━━━
 
-یک QA کامل Responsive انجام بده.
+در Production:
 
-صفحات:
-
-/admin/
-
-/admin/meals/
-
-/admin/schedules/
-
-/admin/reservations/
-
-/admin/students/
-
-/admin/reports/
-
-/admin/activity/
-
-در:
-
-360px
-
-576px
-
-768px
-
-992px
-
-1200px
-
-بررسی شوند.
-
-━━━━━━━━━━━━━━━━━━━━
-33. Charts Mobile
-━━━━━━━━━━━━━━━━━━━━
-
-نمودارها در Mobile:
-
-Overflow نداشته باشند.
-
-Legend مناسب داشته باشند.
-
-ارتفاع مناسب داشته باشند.
-
-Tooltip قابل استفاده باشد.
-
-━━━━━━━━━━━━━━━━━━━━
-34. Excel QA
-━━━━━━━━━━━━━━━━━━━━
-
-حداقل یک Excel واقعی تولید کن و بررسی کن:
-
-* فایل باز می‌شود.
-* Header صحیح است.
-* فارسی خراب نیست.
-* Dateها صحیح هستند.
-* تعداد رکوردها با گزارش یکی است.
-
-━━━━━━━━━━━━━━━━━━━━
-35. Print QA
-━━━━━━━━━━━━━━━━━━━━
-
-یک گزارش واقعی را Print Preview کن.
-
-بررسی:
-
-* Header
-* Table
-* Persian text
-* Page Break
-* عدم نمایش Sidebar
-* عدم نمایش Buttonهای UI
-
-━━━━━━━━━━━━━━━━━━━━
-36. Security Review
-━━━━━━━━━━━━━━━━━━━━
-
-در این فاز یک Security Review سبک انجام بده.
-
-بررسی:
-
-Authentication
-
-Authorization
-
-CSRF
-
-Admin Permissions
-
-Student/Admin Separation
-
-Audit Log Access
-
-Export Access
-
-نباید Student بتواند Export گزارش Admin را دریافت کند.
-
-━━━━━━━━━━━━━━━━━━━━
-37. API Security
-━━━━━━━━━━━━━━━━━━━━
-
-اگر Export Endpoint اضافه شد:
-
-Permission آن:
-
-IsAdminRole
+DEBUG=False
 
 باشد.
 
-اگر Report Endpoint موجود است:
-
-Permission آن را بررسی کن.
-
-هیچ Endpoint مدیریتی نباید بدون Authentication در دسترس باشد.
+نباید امکان فعال شدن ناخواسته DEBUG در Production وجود داشته باشد.
 
 ━━━━━━━━━━━━━━━━━━━━
-38. Database
+7. ALLOWED_HOSTS
 ━━━━━━━━━━━━━━━━━━━━
 
-تا حد امکان:
+ALLOWED_HOSTS باید Environment-based باشد.
 
-Schema تغییر نکند.
+مثلاً:
 
-Migration جدید ایجاد نکن.
+ALLOWED_HOSTS=example.com,[www.example.com](http://www.example.com)
 
-اگر برای Export یا Report نیاز به تغییر Database نیست:
+اما Domain واقعی را حدس نزن.
 
-هیچ Migration ایجاد نکن.
-
-━━━━━━━━━━━━━━━━━━━━
-39. Desktop Compatibility
-━━━━━━━━━━━━━━━━━━━━
-
-Desktop Application نباید تغییر کند.
-
-بعد از تغییرات:
-
-Desktop Login
-
-Desktop API
-
-Desktop Reservation
-
-را Regression Test کن.
+از مقدار Environment استفاده کن.
 
 ━━━━━━━━━━━━━━━━━━━━
-40. Tests
+8. CSRF Trusted Origins
 ━━━━━━━━━━━━━━━━━━━━
 
-تست‌های جدید اضافه کن.
+برای Web Session Authentication:
+
+CSRF_TRUSTED_ORIGINS
+
+را بررسی کن.
+
+در صورت استفاده از HTTPS:
+
+https://example.com
+
+و در صورت نیاز:
+
+https://www.example.com
+
+قرار گیرد.
+
+Domain واقعی باید از Environment خوانده شود.
+
+━━━━━━━━━━━━━━━━━━━━
+9. CORS
+━━━━━━━━━━━━━━━━━━━━
+
+اگر Web داخل همان Django Serve می‌شود:
+
+CORS غیرضروری ایجاد نکن.
+
+اگر CORS package موجود است:
+
+بررسی کن که:
+
+CORS_ALLOW_ALL_ORIGINS
+
+فعال نباشد.
+
+اگر CORS مورد نیاز نیست:
+
+تنظیمات اضافی آن را بی‌دلیل اضافه نکن.
+
+━━━━━━━━━━━━━━━━━━━━
+10. Secure Cookies
+━━━━━━━━━━━━━━━━━━━━
+
+برای Production بررسی کن:
+
+SESSION_COOKIE_SECURE
+
+CSRF_COOKIE_SECURE
+
+SECURE_BROWSER_XSS_FILTER
+
+SECURE_CONTENT_TYPE_NOSNIFF
+
+X_FRAME_OPTIONS
+
+در صورت سازگاری با پروژه فعال شوند.
+
+تنظیمات امنیتی را با نسخه Django فعلی سازگار کن.
+
+━━━━━━━━━━━━━━━━━━━━
+11. HTTPS
+━━━━━━━━━━━━━━━━━━━━
+
+Production باید برای HTTPS آماده باشد.
+
+در صورت استفاده از Reverse Proxy:
+
+SECURE_PROXY_SSL_HEADER
+
+بررسی شود.
+
+Redirect HTTP → HTTPS
+
+فقط در Production فعال شود.
+
+⚠️ در Local Development باعث خراب شدن سایت نشود.
+
+━━━━━━━━━━━━━━━━━━━━
+12. Static Files
+━━━━━━━━━━━━━━━━━━━━
+
+Static structure را بررسی کن.
+
+اطمینان حاصل کن:
+
+STATIC_URL
+
+STATIC_ROOT
+
+STATICFILES_DIRS
+
+به شکل صحیح تنظیم شده باشند.
+
+دستور:
+
+python manage.py collectstatic
+
+را در محیط تست اجرا کن.
+
+بررسی کن تمام:
+
+CSS
+
+JS
+
+Images
+
+Fonts
+
+Bootstrap
+
+Chart.js
+
+Font Awesome
+
+در Production قابل سرو شدن باشند.
+
+━━━━━━━━━━━━━━━━━━━━
+13. Media Files
+━━━━━━━━━━━━━━━━━━━━
+
+اگر پروژه Media دارد:
+
+MEDIA_ROOT
+
+MEDIA_URL
+
+را بررسی کن.
+
+اگر فعلاً Media نداریم:
+
+تنظیم غیرضروری ایجاد نکن.
+
+━━━━━━━━━━━━━━━━━━━━
+14. WhiteNoise
+━━━━━━━━━━━━━━━━━━━━
+
+بررسی کن آیا WhiteNoise در پروژه وجود دارد.
+
+اگر وجود دارد:
+
+تنظیم آن را بررسی و اصلاح کن.
+
+اگر وجود ندارد:
+
+فقط در صورتی اضافه کن که برای Deployment فعلی واقعاً مفید باشد.
+
+برای Server + Nginx الزاماً نیاز به WhiteNoise نیست.
+
+━━━━━━━━━━━━━━━━━━━━
+15. Database Production
+━━━━━━━━━━━━━━━━━━━━
+
+MySQL Production را بررسی کن.
+
+Environment Variables:
+
+DB_NAME
+
+DB_USER
+
+DB_PASSWORD
+
+DB_HOST
+
+DB_PORT
+
+باید استفاده شوند.
+
+SQLite نباید به صورت ناخواسته در Production فعال شود.
+
+━━━━━━━━━━━━━━━━━━━━
+16. Database Safety
+━━━━━━━━━━━━━━━━━━━━
+
+بررسی کن اگر:
+
+DB_NAME
+
+در Production وجود نداشت:
+
+برنامه به SQLite fallback نکند.
+
+Production باید Fail Fast باشد.
+
+یعنی Configuration اشتباه سریعاً مشخص شود.
+
+━━━━━━━━━━━━━━━━━━━━
+17. Database Connection
+━━━━━━━━━━━━━━━━━━━━
+
+تنظیمات MySQL را بررسی کن:
+
+charset
+
+timezone
+
+connection lifetime
+
+strict mode
+
+در صورت نیاز.
+
+تنظیماتی که از قبل صحیح هستند را تغییر نده.
+
+━━━━━━━━━━━━━━━━━━━━
+18. Migrations
+━━━━━━━━━━━━━━━━━━━━
+
+بررسی کن:
+
+python manage.py makemigrations --check
+
+و:
+
+python manage.py showmigrations
+
+اجرا شوند.
+
+اگر Migration Pending وجود دارد:
+
+گزارش کن.
+
+Migration جدید بدون نیاز ایجاد نکن.
+
+━━━━━━━━━━━━━━━━━━━━
+19. Deployment Check
+━━━━━━━━━━━━━━━━━━━━
+
+اجرا کن:
+
+python manage.py check --deploy
+
+اگر Warning وجود دارد:
+
+هر Warning را بررسی کن.
+
+Warningهای واقعی Security را تا حد امکان رفع کن.
+
+Warningهایی که وابسته به Infrastructure هستند را در گزارش نهایی مشخص کن.
+
+━━━━━━━━━━━━━━━━━━━━
+20. Logging
+━━━━━━━━━━━━━━━━━━━━
+
+Logging Production را بررسی کن.
 
 حداقل:
 
-Admin Report Access
+Django Errors
 
-Student Cannot Access Reports
+Server Errors
 
-Admin Export Access
+Authentication Errors
 
-Student Cannot Export Reports
+API Errors
 
-Daily Report
+Database Errors
 
-Meal Report
+ثبت شوند.
 
-Student Report
+Password
 
-Date Range Report
+Token
 
-Audit Log Access
+Secret
 
-Student Cannot Access Audit Log
+CSRF Token
 
-Excel Export
+اطلاعات حساس
 
-CSV Export در صورت پیاده‌سازی
+نباید در Log ثبت شوند.
 
 ━━━━━━━━━━━━━━━━━━━━
-41. Regression
+21. Log Rotation
 ━━━━━━━━━━━━━━━━━━━━
 
-تمام تست‌ها را اجرا کن.
+اگر File Logging وجود دارد:
 
-Backend
+بررسی کن Logها بی‌نهایت رشد نکنند.
 
-Desktop
+در صورت نیاز:
 
-Web
+RotatingFileHandler
+
+یا راهکار مناسب محیط Server استفاده شود.
+
+اگر Logging توسط Supervisor/Systemd/Docker مدیریت می‌شود:
+
+راهکار موجود را حفظ کن.
+
+━━━━━━━━━━━━━━━━━━━━
+22. Error Pages
+━━━━━━━━━━━━━━━━━━━━
+
+صفحات:
+
+400
+
+403
+
+404
+
+500
+
+را بررسی کن.
+
+برای Web:
+
+UI هماهنگ با سایت داشته باشند.
+
+برای API:
+
+JSON Response مناسب باقی بماند.
+
+API نباید به جای JSON صفحه HTML دریافت کند مگر در Endpointهای HTML.
+
+━━━━━━━━━━━━━━━━━━━━
+23. Authentication Production Review
+━━━━━━━━━━━━━━━━━━━━
+
+بررسی کن:
+
+Student Login
+
+Admin Login
+
+Session
+
+CSRF
+
+Logout
+
+Session Expiration
+
+Role Permissions
+
+در Production صحیح باشند.
+
+Desktop:
+
+Token Authentication
+
+باید بدون تغییر باقی بماند.
+
+━━━━━━━━━━━━━━━━━━━━
+24. Session Security
+━━━━━━━━━━━━━━━━━━━━
+
+Session Cookie را بررسی کن.
+
+در Production:
+
+Secure
+
+HttpOnly
+
+SameSite
+
+تنظیم مناسب داشته باشد.
+
+مقادیر را با Flow فعلی Web سازگار نگه دار.
+
+━━━━━━━━━━━━━━━━━━━━
+25. Admin Security
+━━━━━━━━━━━━━━━━━━━━
+
+بررسی کن:
+
+Student
+
+نتواند:
+
+Admin Dashboard
+
+Reports
+
+Exports
+
+Activity Logs
+
+را مشاهده کند.
+
+حتی با وارد کردن مستقیم URL.
+
+Frontend Check کافی نیست.
+
+Backend Permission باید مرجع اصلی باشد.
+
+━━━━━━━━━━━━━━━━━━━━
+26. API Security Review
+━━━━━━━━━━━━━━━━━━━━
+
+Endpointهای زیر را بررسی کن:
+
+Authentication
+
+Student
+
+Reservation
 
 Admin
 
 Reports
 
-و نتیجه دقیق را اعلام کن.
+Export
+
+Activity
+
+برای هر کدام:
+
+Authentication
+
+Permission
+
+CSRF
+
+Rate Limiting در صورت نیاز
+
+بررسی شود.
+
+━━━━━━━━━━━━━━━━━━━━
+27. Rate Limiting
+━━━━━━━━━━━━━━━━━━━━
+
+Throttleهای فعلی را بررسی کن.
+
+مخصوصاً:
+
+Login
+
+Student Login
+
+Authentication
+
+اگر Rate Limit مناسب وجود دارد:
+
+حفظ شود.
+
+اگر کمبود واضحی وجود دارد:
+
+حداقل تغییر لازم را انجام بده.
+
+Throttle تست‌ها را خراب نکن.
+
+━━━━━━━━━━━━━━━━━━━━
+28. Password / Login
+━━━━━━━━━━━━━━━━━━━━
+
+روش Login فعلی را تغییر نده.
+
+Student:
+
+student_code + phone_number
+
+Admin:
+
+روش فعلی
+
+باید حفظ شود.
+
+⚠️ در این فاز Password Login جدید برای Student اضافه نکن.
+
+━━━━━━━━━━━━━━━━━━━━
+29. Backup Strategy
+━━━━━━━━━━━━━━━━━━━━
+
+برای MySQL یک مستند Backup ایجاد کن.
 
 مثلاً:
 
-Backend:
-XX passed
-
-Desktop:
-8 passed
-
-Web:
-XX passed
-
-Total:
-XX passed
-
-━━━━━━━━━━━━━━━━━━━━
-42. manage.py check
-━━━━━━━━━━━━━━━━━━━━
-
-در پایان اجرا کن:
-
-python manage.py check
-
-و در صورت امکان:
-
-python manage.py check --deploy
-
-⚠️ اگر محیط Windows است، از دستورهای سازگار با PowerShell استفاده کن.
-
-از Unix commandهایی مثل:
-
-head
-
-grep
-
-sed
-
-بدون اطمینان از محیط استفاده نکن.
-
-━━━━━━━━━━━━━━━━━━━━
-43. Code Cleanup
-━━━━━━━━━━━━━━━━━━━━
-
-فقط Cleanup مرتبط با Phase 6 انجام بده.
-
-کدهای:
-
-Unused
-
-Duplicate
-
-Dead
-
-را در صورت اطمینان حذف کن.
-
-کد فعال و نامطمئن را حذف نکن.
-
-━━━━━━━━━━━━━━━━━━━━
-44. Documentation
-━━━━━━━━━━━━━━━━━━━━
-
-در صورت وجود:
-
-docs/
-
-یک سند:
-
-docs/web_phase6_reports.md
-
-ایجاد کن.
+docs/production_backup.md
 
 شامل:
 
-Report Architecture
+mysqldump
 
-Export Architecture
+زمان‌بندی Backup
 
-Audit Log
+محل Backup
 
-Admin Security
+Retention
+
+Restore Procedure
+
+باشد.
+
+⚠️ Backup واقعی Production را بدون درخواست اجرا نکن.
+
+━━━━━━━━━━━━━━━━━━━━
+30. Restore Documentation
+━━━━━━━━━━━━━━━━━━━━
+
+مراحل Restore را مستند کن.
+
+مثلاً:
+
+mysql database < backup.sql
+
+اما Command را متناسب با Database واقعی پروژه بنویس.
+
+━━━━━━━━━━━━━━━━━━━━
+31. Deployment Documentation
+━━━━━━━━━━━━━━━━━━━━
+
+سند:
+
+docs/deployment.md
+
+ایجاد یا تکمیل کن.
+
+شامل:
+
+Server Requirements
+
+Python Version
+
+MySQL Version
+
+Environment Variables
+
+Install Dependencies
+
+Database Setup
+
+Migration
+
+Collectstatic
+
+Create Superuser
+
+Run Application
+
+Reverse Proxy
+
+HTTPS
 
 باشد.
 
 ━━━━━━━━━━━━━━━━━━━━
-45. Final QA Flow
+32. Server Architecture
 ━━━━━━━━━━━━━━━━━━━━
 
-این Flow را کامل انجام بده:
+یک Architecture پیشنهادی مستند کن:
+
+Internet
+
+↓
+
+Nginx
+
+↓
+
+Gunicorn
+
+↓
+
+Django
+
+↓
+
+MySQL
+
+Static / Media
+
+از مسیر مناسب سرو شوند.
+
+اما فعلاً هیچ Server واقعی را بدون اطلاعات کاربر تغییر نده.
+
+━━━━━━━━━━━━━━━━━━━━
+33. Requirements
+━━━━━━━━━━━━━━━━━━━━
+
+فایل:
+
+requirements.txt
+
+یا ساختار فعلی Dependency Management را بررسی کن.
+
+اطمینان حاصل کن Dependencyهای Production مشخص باشند.
+
+Packageهای غیرضروری را حذف نکن مگر مطمئن باشی استفاده نمی‌شوند.
+
+━━━━━━━━━━━━━━━━━━━━
+34. Dependency Review
+━━━━━━━━━━━━━━━━━━━━
+
+بررسی کن:
+
+Django
+
+DRF
+
+MySQL Driver
+
+openpyxl
+
+Chart.js
+
+Bootstrap
+
+و سایر Dependencyها.
+
+نسخه‌های فعلی را بدون دلیل Upgrade نکن.
+
+این فاز Migration به نسخه جدید Framework نیست.
+
+━━━━━━━━━━━━━━━━━━━━
+35. Static Third-party Assets
+━━━━━━━━━━━━━━━━━━━━
+
+بررسی کن آیا:
+
+Bootstrap
+
+Chart.js
+
+Font Awesome
+
+از CDN می‌آیند یا Local.
+
+برای Production تصمیم فعلی پروژه را حفظ کن.
+
+اگر CDN استفاده شده:
+
+بررسی کن CSP یا Network restrictions باعث خرابی نشوند.
+
+━━━━━━━━━━━━━━━━━━━━
+36. Content Security
+━━━━━━━━━━━━━━━━━━━━
+
+یک بررسی سبک امنیت Frontend انجام بده.
+
+بررسی:
+
+Inline Script
+
+Inline Event Handler
+
+External CDN
+
+unsafe-eval
+
+unsafe-inline
+
+اما CSP کامل را فقط اگر بدون شکستن پروژه قابل پیاده‌سازی است اضافه کن.
+
+━━━━━━━━━━━━━━━━━━━━
+37. File Upload Security
+━━━━━━━━━━━━━━━━━━━━
+
+اگر پروژه Upload دارد:
+
+File Type
+
+File Size
+
+Filename
+
+Storage
+
+را بررسی کن.
+
+اگر Upload ندارد:
+
+این بخش را تغییر نده.
+
+━━━━━━━━━━━━━━━━━━━━
+38. Export Security
+━━━━━━━━━━━━━━━━━━━━
+
+Exportهای:
+
+CSV
+
+XLSX
+
+PDF
+
+را بررسی کن.
+
+Student نباید بتواند آنها را دریافت کند.
+
+Export باید Permission Admin داشته باشد.
+
+نام فایل‌ها نباید شامل اطلاعات حساس غیرضروری باشد.
+
+━━━━━━━━━━━━━━━━━━━━
+39. Audit Log Production
+━━━━━━━━━━━━━━━━━━━━
+
+ثبت Activityهای مهم را بررسی کن.
+
+حداقل:
 
 Admin Login
 
-↓
+Admin Logout
 
-Dashboard
+Create Meal
 
-↓
+Update Meal
+
+Delete Meal
+
+Create Schedule
+
+Update Schedule
+
+Delete Schedule
+
+Export Report
+
+را در صورت پشتیبانی فعلی ثبت کن.
+
+اگر بعضی Actionها قبلاً ثبت می‌شوند:
+
+Duplicate Logging ایجاد نکن.
+
+━━━━━━━━━━━━━━━━━━━━
+40. Timezone
+━━━━━━━━━━━━━━━━━━━━
+
+Timezone پروژه را بررسی کن.
+
+تاریخ‌های:
+
+Reservation
+
+Schedule
+
+Report
+
+Audit Log
+
+باید با Timezone مورد نظر پروژه سازگار باشند.
+
+⚠️ Timezone را حدس نزن.
+
+از تنظیم فعلی پروژه استفاده کن و فقط در صورت وجود مشکل اصلاح کن.
+
+━━━━━━━━━━━━━━━━━━━━
+41. Persian Date
+━━━━━━━━━━━━━━━━━━━━
+
+اگر UI از تاریخ شمسی استفاده می‌کند:
+
+Backend Date استاندارد را تغییر نده.
+
+Presentation Layer مسئول تبدیل نمایش باشد.
+
+گزارش‌ها باید تاریخ صحیح Backend را دریافت کنند.
+
+━━━━━━━━━━━━━━━━━━━━
+42. Production Performance
+━━━━━━━━━━━━━━━━━━━━
+
+بررسی سبک:
+
+N+1 Queries
+
+Dashboard Queries
+
+Reports Queries
+
+Reservation Queries
+
+Admin Tables
+
+انجام بده.
+
+اگر Query بهینه‌سازی واضحی لازم دارد:
+
+حداقل تغییر امن را انجام بده.
+
+━━━━━━━━━━━━━━━━━━━━
+43. Database Indexes
+━━━━━━━━━━━━━━━━━━━━
+
+Modelها را بررسی کن.
+
+اگر Index مهمی کاملاً مفقود است:
+
+فقط گزارش کن یا در صورت ضرورت واقعی با احتیاط Migration ایجاد کن.
+
+Indexهای حدسی اضافه نکن.
+
+━━━━━━━━━━━━━━━━━━━━
+44. Frontend Production
+━━━━━━━━━━━━━━━━━━━━
+
+بررسی کن:
+
+Console Error
+
+Broken JS
+
+404 Static
+
+Broken CSS
+
+Chart Errors
+
+Failed API Requests
+
+وجود نداشته باشند.
+
+━━━━━━━━━━━━━━━━━━━━
+45. Browser QA
+━━━━━━━━━━━━━━━━━━━━
+
+با Browser واقعی بررسی کن:
+
+Login
+
+Student Dashboard
+
+Meal Schedule
+
+Reservation
+
+My Reservations
+
+Admin Dashboard
+
+Meals
+
+Schedules
+
+Reservations
+
+Students
 
 Reports
 
-↓
+Exports
 
-انتخاب Date Range
-
-↓
-
-مشاهده Report
-
-↓
-
-مشاهده Chart
-
-↓
-
-Export Excel
-
-↓
-
-باز کردن فایل Excel
-
-↓
-
-Print Preview
-
-↓
-
-Activity Log
-
-↓
+Activity
 
 Logout
 
 ━━━━━━━━━━━━━━━━━━━━
-46. Final Report
+46. Responsive QA
 ━━━━━━━━━━━━━━━━━━━━
 
-در پایان گزارش مدیریتی و فنی ارائه کن.
+حداقل:
+
+360px
+
+576px
+
+768px
+
+992px
+
+1200px
+
+بررسی شود.
+
+صفحات:
+
+Student
+
+Admin
+
+Reports
+
+Export UI
+
+هیچ Horizontal Overflow غیرضروری نداشته باشند.
+
+━━━━━━━━━━━━━━━━━━━━
+47. Full Regression
+━━━━━━━━━━━━━━━━━━━━
+
+تمام Test Suiteهای موجود را اجرا کن.
+
+Backend
+
+Web
+
+Admin
+
+Desktop
+
+Packaging
+
+نتیجه دقیق را گزارش کن.
+
+━━━━━━━━━━━━━━━━━━━━
+48. Static Verification
+━━━━━━━━━━━━━━━━━━━━
+
+اجرا کن:
+
+python manage.py collectstatic --noinput
+
+و بررسی کن Staticها بدون Error جمع‌آوری می‌شوند.
+
+━━━━━━━━━━━━━━━━━━━━
+49. Production Check
+━━━━━━━━━━━━━━━━━━━━
+
+اجرا کن:
+
+python manage.py check
+
+و:
+
+python manage.py check --deploy
+
+و:
+
+python manage.py makemigrations --check
+
+نتایج را ثبت کن.
+
+━━━━━━━━━━━━━━━━━━━━
+50. Do Not Deploy Yet
+━━━━━━━━━━━━━━━━━━━━
+
+⚠️ در این فاز به هیچ Server واقعی متصل نشو.
+
+⚠️ SSH نکن.
+
+⚠️ Nginx واقعی را تغییر نده.
+
+⚠️ MySQL Production را تغییر نده.
+
+⚠️ DNS را تغییر نده.
+
+⚠️ SSL واقعی نصب نکن.
+
+فقط پروژه را:
+
+Production-Ready
+
+کن و Deployment Documentation آماده کن.
+
+━━━━━━━━━━━━━━━━━━━━
+51. Final Report
+━━━━━━━━━━━━━━━━━━━━
+
+در پایان یک گزارش مدیریتی بده.
 
 گزارش شامل:
 
-1. چه امکاناتی اضافه شد.
+1. وضعیت Production Readiness
 
-2. چه امکاناتی تکمیل شد.
+2. تنظیمات Production
 
-3. چه APIهایی استفاده شدند.
+3. Environment Variables
 
-4. آیا API جدید ایجاد شد؟
+4. Database
 
-5. آیا Model تغییر کرد؟
+5. Static Files
 
-6. آیا Migration ایجاد شد؟
+6. Security
 
-7. Exportها چه هستند؟
+7. Authentication
 
-8. Reports چه هستند؟
+8. Authorization
 
-9. Dashboard چه اطلاعاتی دارد؟
+9. Logging
 
-10. Audit Log چه امکاناتی دارد؟
+10. Backup Documentation
 
-11. Security چه تغییراتی داشت؟
+11. Deployment Documentation
 
-12. Responsive QA چه نتیجه‌ای داشت؟
+12. Export Security
 
-13. Excel QA چه نتیجه‌ای داشت؟
+13. Audit Log
 
-14. Print QA چه نتیجه‌ای داشت؟
+14. Performance Review
 
-15. تعداد تست‌های Backend.
+15. Browser QA
 
-16. تعداد تست‌های Desktop.
+16. Responsive QA
 
-17. تعداد تست‌های Web.
+17. Tests
 
-18. نتیجه manage.py check.
+18. manage.py check
 
-19. مشکلات باقی‌مانده.
+19. check --deploy
 
-20. پیشنهاد Phase 7.
+20. makemigrations --check
+
+21. مواردی که هنوز نیاز به تنظیم Server واقعی دارند
+
+22. مشکلات باقی‌مانده
+
+23. پیشنهاد Phase 8
 
 ━━━━━━━━━━━━━━━━━━━━
-قانون نهایی
+قوانین نهایی Phase 7
 ━━━━━━━━━━━━━━━━━━━━
 
-فقط Phase 6 را انجام بده.
+فقط Phase 7 را انجام بده.
 
-وارد Phase 7 نشو.
+وارد Deployment واقعی نشو.
 
-Business Logic اصلی Reservation را تغییر نده.
+Business Logic را تغییر نده.
 
-Database Schema را بدون ضرورت تغییر نده.
+Reservation Logic را بازنویسی نکن.
 
 Desktop را تغییر رفتاری نده.
 
+Database را بدون ضرورت تغییر نده.
+
 API موجود را Duplicate نکن.
 
-Mock Data را در UI نهایی استفاده نکن.
+Secret واقعی داخل Repository قرار نده.
 
 در پایان متوقف شو.

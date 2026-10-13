@@ -20,11 +20,6 @@ class StudentRegistrationSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True, min_length=8, style={"input_type": "password"})
 
 
-class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=150)
-    password = serializers.CharField(write_only=True, style={"input_type": "password"})
-
-
 class StudentWebLoginSerializer(serializers.Serializer):
     student_code = serializers.CharField(max_length=20)
     phone_number = serializers.CharField(max_length=20)
@@ -51,11 +46,6 @@ class StudentRegistrationResponseSerializer(serializers.ModelSerializer):
         ]
 
 
-class LoginResponseSerializer(serializers.Serializer):
-    token = serializers.CharField(read_only=True)
-    user = AuthUserSerializer(read_only=True)
-
-
 class CurrentUserSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     username = serializers.CharField(read_only=True)
@@ -66,11 +56,6 @@ class CurrentUserSerializer(serializers.Serializer):
     phone = serializers.CharField(read_only=True, required=False, allow_null=True)
     role = serializers.ChoiceField(choices=UserRole.choices, read_only=True)
     is_active = serializers.BooleanField(read_only=True)
-
-
-class StudentWebLoginResponseSerializer(serializers.Serializer):
-    success = serializers.BooleanField(read_only=True)
-    user = CurrentUserSerializer(read_only=True)
 
 
 class WebLoginResponseSerializer(serializers.Serializer):

@@ -3,7 +3,6 @@ from __future__ import annotations
 from datetime import timedelta
 
 from django.utils import timezone
-from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from accounts.models import User, UserRole
@@ -47,9 +46,8 @@ def create_admin_account(*, username: str = "admin", password: str = "AdminPass1
 
 
 def auth_client_for(user: User) -> APIClient:
-    token, _ = Token.objects.get_or_create(user=user)
     client = APIClient()
-    client.credentials(HTTP_AUTHORIZATION=f"Token {token.key}")
+    client.force_authenticate(user=user)
     return client
 
 

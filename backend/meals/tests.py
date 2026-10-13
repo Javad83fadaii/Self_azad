@@ -168,4 +168,4 @@ class StudentUpcomingScheduleApiTests(TestCase):
     def test_upcoming_schedule_requires_authentication(self) -> None:
         response = self.client.get("/api/schedules/upcoming/")
 
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

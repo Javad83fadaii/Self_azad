@@ -3,7 +3,6 @@ from __future__ import annotations
 from django.contrib.auth import authenticate
 from django.db import transaction
 from rest_framework import serializers
-from rest_framework.authtoken.models import Token
 
 from accounts.models import User, UserRole
 from students.models import Student
@@ -44,15 +43,6 @@ def register_student(*, student_code: str, first_name: str, last_name: str, phon
         phone_number=phone_number,
         is_active=True,
     )
-
-
-def login_user(*, username: str, password: str) -> tuple[str, User]:
-    user = authenticate(username=username, password=password)
-    if user is None or not user.is_active:
-        raise serializers.ValidationError({"detail": "Invalid credentials."})
-
-    token, _ = Token.objects.get_or_create(user=user)
-    return token.key, user
 
 
 def login_student_for_web(*, student_code: str, phone_number: str) -> Student:

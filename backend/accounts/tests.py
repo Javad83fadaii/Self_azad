@@ -70,31 +70,6 @@ class AuthenticationApiTests(TestCase):
         self.assertEqual(response.data["student_code"], "40119999")
         self.assertEqual(response.data["user"]["role"], "STUDENT")
 
-    def test_student_login_returns_token(self) -> None:
-        create_student_account()
-
-        response = self.client.post(
-            "/api/auth/login/",
-            {"username": "40110001", "password": "StrongPass123"},
-            format="json",
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("token", response.data)
-        self.assertEqual(response.data["user"]["role"], "STUDENT")
-
-    def test_admin_login_returns_admin_role(self) -> None:
-        create_admin_account()
-
-        response = self.client.post(
-            "/api/auth/login/",
-            {"username": "admin", "password": "AdminPass123"},
-            format="json",
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["user"]["role"], "ADMIN")
-
     def test_student_web_login_creates_session(self) -> None:
         create_student_account(first_name="علی", last_name="احمدی")
         browser_client = self._create_browser_client()
@@ -239,7 +214,7 @@ class AuthenticationApiTests(TestCase):
     def test_current_user_requires_authentication(self) -> None:
         response = self.client.get("/api/auth/me/")
 
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_logout_invalidates_current_session(self) -> None:
         create_student_account()
@@ -258,26 +233,13 @@ class AuthenticationApiTests(TestCase):
 
         self.assertEqual(logout_response.status_code, status.HTTP_200_OK)
         self.assertTrue(logout_response.data["success"])
-        self.assertEqual(me_response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(me_response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_desktop_token_login_is_preserved(self) -> None:
-        create_student_account()
-
-        response = self.client.post(
-            "/api/auth/login/",
-            {"username": "40110001", "password": "StrongPass123"},
-            format="json",
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("token", response.data)
-        self.assertEqual(response.data["user"]["role"], "STUDENT")
-
-    def test_desktop_token_auth_can_access_student_api(self) -> None:
+    def test_authenticated_user_can_access_student_api(self) -> None:
         user, student = create_student_account()
-        token_client = auth_client_for(user)
+        authenticated_client = auth_client_for(user)
 
-        response = token_client.get("/api/students/me/profile/")
+        response = authenticated_client.get("/api/students/me/profile/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["student_code"], student.student_code)

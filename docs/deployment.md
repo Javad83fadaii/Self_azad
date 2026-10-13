@@ -45,7 +45,7 @@ Media: توسط Nginx از backend/media
 - `openpyxl==3.1.5`
 - `reportlab==4.4.4`
 
-Dependencyهای desktop نیز در همان فایل وجود دارند؛ در این فاز حذف نشده‌اند تا رفتار build فعلی تغییر نکند.
+Dependencyهای مربوط به Desktop از پروژه حذف شده‌اند و `requirements.txt` فقط نیازمندی‌های فاز وب را نگه می‌دارد.
 
 ## Environment Variables
 
