@@ -14,28 +14,11 @@ from accounts.serializers import (
     AdminWebLoginSerializer,
     CurrentUserSerializer,
     StudentWebLoginSerializer,
-    StudentRegistrationResponseSerializer,
-    StudentRegistrationSerializer,
     WebLoginResponseSerializer,
 )
 from accounts.models import UserRole
-from accounts.services import build_current_user_payload, login_admin_for_web, login_student_for_web, register_student
+from accounts.services import build_current_user_payload, login_admin_for_web, login_student_for_web
 from audit_logs.services import log_action
-
-
-class StudentRegistrationView(APIView):
-    """Register a student account and create its linked student profile."""
-
-    permission_classes = [permissions.AllowAny]
-    throttle_classes = [ScopedRateThrottle]
-    throttle_scope = "auth"
-
-    def post(self, request, *args, **kwargs):
-        serializer = StudentRegistrationSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        student = register_student(**serializer.validated_data)
-        response_serializer = StudentRegistrationResponseSerializer(student)
-        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
 
 @method_decorator(ensure_csrf_cookie, name="dispatch")

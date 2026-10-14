@@ -32,7 +32,7 @@
                         <span class="login-card__badge" aria-hidden="true"><i class="fa-solid fa-building-columns"></i></span>
                         <p class="login-card__eyebrow">{{ web_brand_subtitle }}</p>
                         <h2 class="h4 mb-2">ورود به سامانه</h2>
-                        <p class="text-muted mb-0">بر اساس نوع حساب، فرم مناسب را تکمیل کنید.</p>
+                        <p class="text-muted mb-0">دانشجوها با کد دانشجویی و موبایل وارد می‌شوند؛ اگر اولین ورود باشد، تکمیل نام و نام خانوادگی هم در همین فرم انجام می‌شود.</p>
                     </div>
 
                     <ul class="nav nav-pills login-tabs mb-4" id="login-tablist" role="tablist">
@@ -71,6 +71,23 @@
                                     <label for="phone_number" class="form-label">شماره موبایل</label>
                                     <input id="phone_number" name="phone_number" type="tel" class="form-control" inputmode="tel" autocomplete="tel" placeholder="09121234567" required>
                                     <div class="invalid-feedback">شماره موبایل را وارد کنید.</div>
+                                </div>
+
+                                <div class="alert alert-info d-none" data-first-login-hint aria-live="polite">
+                                    اگر این اولین ورود شماست یا پروفایل‌تان هنوز کامل نشده، نام و نام خانوادگی را هم وارد کنید.
+                                </div>
+
+                                <div class="row g-3 d-none" data-first-login-fields>
+                                    <div class="col-12 col-md-6">
+                                        <label for="first_name" class="form-label">نام</label>
+                                        <input id="first_name" name="first_name" type="text" class="form-control" autocomplete="given-name">
+                                        <div class="invalid-feedback">نام را وارد کنید.</div>
+                                    </div>
+                                    <div class="col-12 col-md-6 mb-4">
+                                        <label for="last_name" class="form-label">نام خانوادگی</label>
+                                        <input id="last_name" name="last_name" type="text" class="form-control" autocomplete="family-name">
+                                        <div class="invalid-feedback">نام خانوادگی را وارد کنید.</div>
+                                    </div>
                                 </div>
 
                                 <button id="student-login-submit" type="submit" class="btn btn-primary w-100">

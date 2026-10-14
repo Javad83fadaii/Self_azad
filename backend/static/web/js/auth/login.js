@@ -23,6 +23,32 @@ function validateForm(form) {
     return Array.from(form.querySelectorAll("input[required]")).every(validateField);
 }
 
+function enableFirstLoginFields(form) {
+    const fieldsWrapper = form.querySelector("[data-first-login-fields]");
+    const hint = form.querySelector("[data-first-login-hint]");
+    if (!fieldsWrapper) {
+        return;
+    }
+
+    fieldsWrapper.classList.remove("d-none");
+    if (hint) {
+        hint.classList.remove("d-none");
+    }
+
+    fieldsWrapper.querySelectorAll("input").forEach((field) => {
+        field.required = true;
+    });
+}
+
+function focusFirstIncompleteProfileField(form) {
+    const targetField = Array.from(form.querySelectorAll("[data-first-login-fields] input")).find(
+        (field) => !field.value.trim(),
+    );
+    if (targetField) {
+        targetField.focus();
+    }
+}
+
 function bindLoginForm(form) {
     const feedback = form.parentElement.querySelector("[data-login-feedback]");
     const submitButton = form.querySelector("button[type='submit']");
@@ -56,6 +82,13 @@ function bindLoginForm(form) {
             await post(form.dataset.loginUrl, payload, { csrfUrl: form.dataset.csrfUrl });
             window.location.assign(form.dataset.successUrl);
         } catch (error) {
+            if (form.dataset.webLoginForm === "student" && error?.data?.requires_profile_completion) {
+                enableFirstLoginFields(form);
+                focusFirstIncompleteProfileField(form);
+                showFeedback(feedback, extractErrorMessage(error), "info");
+                return;
+            }
+
             showFeedback(feedback, extractErrorMessage(error));
         } finally {
             setLoading(submitButton, false, idleLabel, loadingLabel);

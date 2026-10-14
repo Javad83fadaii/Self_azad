@@ -1,6 +1,6 @@
 from django.urls import path
 
-from accounts.views import AdminWebLoginView, CsrfTokenView, CurrentUserView, LogoutView, StudentRegistrationView, StudentWebLoginView
+from accounts.views import AdminWebLoginView, CsrfTokenView, CurrentUserView, LogoutView, StudentWebLoginView
 
 app_name = "accounts"
 
@@ -8,7 +8,6 @@ urlpatterns = [
     path("auth/csrf/", CsrfTokenView.as_view(), name="csrf"),
     path("auth/me/", CurrentUserView.as_view(), name="me"),
     path("auth/logout/", LogoutView.as_view(), name="logout"),
-    path("auth/student/register/", StudentRegistrationView.as_view(), name="student-register"),
     path("auth/student/login/", StudentWebLoginView.as_view(), name="student-web-login"),
     path("auth/admin/login/", AdminWebLoginView.as_view(), name="admin-web-login"),
 ]

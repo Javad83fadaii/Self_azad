@@ -80,6 +80,8 @@ python -m unittest discover -s tests -p "test_*.py"
 
 - دریافت CSRF: `GET /api/auth/csrf/`
 - ورود دانشجو برای وب: `POST /api/auth/student/login/`
+  - اگر حساب از قبل وجود داشته باشد، با `student_code` و `phone_number` وارد می‌شود.
+  - اگر اولین ورود باشد، همان endpoint با `first_name` و `last_name` حساب دانشجویی را ایجاد یا پروفایل ناقص را کامل می‌کند.
 - ورود مدیر برای وب: `POST /api/auth/admin/login/`
 - کاربر جاری: `GET /api/auth/me/`
 - خروج: `POST /api/auth/logout/`
